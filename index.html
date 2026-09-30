@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Designia AI</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+  <!-- =========================
+       ÉCRAN DE CONNEXION
+  ========================== -->
+
+  <section id="authScreen" class="screen">
+
+    <div class="auth-card">
+
+      <div class="logo">✨</div>
+
+      <h1>Designia AI</h1>
+
+      <p class="subtitle">
+        Ton atelier créatif pour tes produits
+      </p>
+
+      <div class="auth-tabs">
+        <button id="loginTab" class="tab active">
+          Connexion
+        </button>
+
+        <button id="signupTab" class="tab">
+          Créer un compte
+        </button>
+      </div>
+
+      <form id="authForm">
+
+        <label for="email">
+          Adresse e-mail
+        </label>
+
+        <input
+          id="email"
+          type="email"
+          placeholder="ton@email.com"
+          required
+        >
+
+        <label for="password">
+          Mot de passe
+        </label>
+
+        <input
+          id="password"
+          type="password"
+          placeholder="••••••••"
+          required
+        >
+
+        <button
+          type="submit"
+          id="authButton"
+          class="primary-button"
+        >
+          Se connecter
+        </button>
+
+      </form>
+
+      <p id="authMessage" class="message"></p>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       TABLEAU DE BORD
+  ========================== -->
+
+  <section id="dashboard" class="screen hidden">
+
+    <header class="topbar">
+
+      <div>
+        <h1>✨ Designia AI</h1>
+        <p>Ton espace créatif</p>
+      </div>
+
+      <button
+        id="logoutButton"
+        class="secondary-button"
+      >
+        Déconnexion
+      </button>
+
+    </header>
+
+
+    <main class="dashboard-content">
+
+      <div class="welcome-box">
+
+        <div>
+          <h2 id="welcomeTitle">
+            Bienvenue 👋
+          </h2>
+
+          <p>
+            Crée tes produits, ajoute tes photos
+            et prépare tes visuels.
+          </p>
+        </div>
+
+        <button
+          id="newProductButton"
+          class="primary-button"
+        >
+          + Créer un produit
+        </button>
+
+      </div>
+
+
+      <div class="section-header">
+
+        <div>
+          <h2>Mes produits</h2>
+          <p>
+            Tes derniers produits créés
+          </p>
+        </div>
+
+      </div>
+
+
+      <div
+        id="productsGrid"
+        class="products-grid"
+      ></div>
+
+
+      <div
+        id="emptyProducts"
+        class="empty-state hidden"
+      >
+
+        <div class="empty-icon">
+          🎨
+        </div>
+
+        <h3>
+          Aucun produit pour le moment
+        </h3>
+
+        <p>
+          Commence par créer ton premier produit.
+        </p>
+
+        <button
+         

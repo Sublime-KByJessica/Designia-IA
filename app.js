@@ -1857,6 +1857,14 @@ async function getProductReferenceImageData() {
           new Image();
 
 
+        /*
+         * Autorise le navigateur à utiliser
+         * l'image distante dans le canvas.
+         */
+        img.crossOrigin =
+          "anonymous";
+
+
         img.onload =
           function () {
 

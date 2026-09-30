@@ -719,6 +719,149 @@
        JAVASCRIPT
   ========================== -->
 
+  <!-- =========================
+     APERÇU PERSONNALISATION
+========================== -->
+
+<div
+  id="personalizationPanel"
+  class="personalization-panel hidden"
+>
+
+  <div class="personalization-header">
+
+    <div>
+
+      <span class="ai-small-label">
+        APERÇU PERSONNALISÉ
+      </span>
+
+      <h3>
+        ✨ Personnalisez votre produit
+      </h3>
+
+      <p>
+        Visualisez directement votre personnalisation
+        sur la photo réelle du produit.
+      </p>
+
+    </div>
+
+    <button
+      id="closePersonalization"
+      class="ai-close-button"
+      type="button"
+    >
+      ×
+    </button>
+
+  </div>
+
+
+  <div class="personalization-layout">
+
+    <!-- =========================
+         APERÇU DU PRODUIT
+    ========================== -->
+
+    <div class="personalization-preview-area">
+
+      <div class="personalization-preview-title">
+        Aperçu en direct
+      </div>
+
+      <div
+        id="personalizationPreview"
+        class="personalization-preview"
+      >
+
+        <span>
+          📷
+        </span>
+
+        <p>
+          Aperçu du produit
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- =========================
+         OPTIONS DE PERSONNALISATION
+    ========================== -->
+
+    <div class="personalization-options">
+
+      <label for="personalizationText">
+        ✏️ Votre prénom / texte
+      </label>
+
+      <input
+        id="personalizationText"
+        type="text"
+        placeholder="Votre prénom / texte"
+        maxlength="40"
+        autocomplete="off"
+      >
+
+
+      <label for="personalizationColor">
+        🎨 Couleur du texte
+      </label>
+
+      <input
+        id="personalizationColor"
+        type="color"
+        value="#d98fa6"
+      >
+
+
+      <label for="personalizationFont">
+        🔤 Police d'écriture
+      </label>
+
+      <select id="personalizationFont">
+
+        <option value="Arial">
+          Classique
+        </option>
+
+        <option value="'Trebuchet MS'">
+          Douce
+        </option>
+
+        <option value="'Brush Script MT'">
+          Écriture manuscrite
+        </option>
+
+        <option value="'Courier New'">
+          Machine à écrire
+        </option>
+
+        <option value="Georgia">
+          Élégante
+        </option>
+
+      </select>
+
+
+      <div class="personalization-info-box">
+
+        💡
+        <strong>Aperçu en direct :</strong>
+        votre prénom ou texte apparaîtra directement
+        sur la photo du produit.
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+  
   <script src="app.js"></script>
 
 </body>

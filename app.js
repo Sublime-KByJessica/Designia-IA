@@ -10,85 +10,201 @@ let currentUser = null;
 let currentProduct = null;
 let categories = [];
 let authMode = "login";
+let editingProduct = null;
+let selectedGenerationType = null;
 
 
 /* =====================================================
    ÉLÉMENTS
 ===================================================== */
 
-const authScreen = document.getElementById("authScreen");
-const dashboard = document.getElementById("dashboard");
+const authScreen =
+  document.getElementById("authScreen");
 
-const authForm = document.getElementById("authForm");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const authButton = document.getElementById("authButton");
-const authMessage = document.getElementById("authMessage");
+const dashboard =
+  document.getElementById("dashboard");
 
-const loginTab = document.getElementById("loginTab");
-const signupTab = document.getElementById("signupTab");
+const authForm =
+  document.getElementById("authForm");
 
-const logoutButton = document.getElementById("logoutButton");
+const emailInput =
+  document.getElementById("email");
+
+const passwordInput =
+  document.getElementById("password");
+
+const authButton =
+  document.getElementById("authButton");
+
+const authMessage =
+  document.getElementById("authMessage");
+
+const loginTab =
+  document.getElementById("loginTab");
+
+const signupTab =
+  document.getElementById("signupTab");
+
+const logoutButton =
+  document.getElementById("logoutButton");
 
 const newProductButton =
   document.getElementById("newProductButton");
 
 const emptyNewProductButton =
-  document.getElementById("emptyNewProductButton");
+  document.getElementById(
+    "emptyNewProductButton"
+  );
 
 const productModal =
-  document.getElementById("productModal");
+  document.getElementById(
+    "productModal"
+  );
 
 const closeProductModal =
-  document.getElementById("closeProductModal");
+  document.getElementById(
+    "closeProductModal"
+  );
 
 const cancelProductButton =
-  document.getElementById("cancelProductButton");
+  document.getElementById(
+    "cancelProductButton"
+  );
 
 const productForm =
-  document.getElementById("productForm");
+  document.getElementById(
+    "productForm"
+  );
 
 const productPhoto =
-  document.getElementById("productPhoto");
+  document.getElementById(
+    "productPhoto"
+  );
 
 const photoPreview =
-  document.getElementById("photoPreview");
+  document.getElementById(
+    "photoPreview"
+  );
 
 const productName =
-  document.getElementById("productName");
+  document.getElementById(
+    "productName"
+  );
 
 const productCategory =
-  document.getElementById("productCategory");
+  document.getElementById(
+    "productCategory"
+  );
 
 const productPrice =
-  document.getElementById("productPrice");
+  document.getElementById(
+    "productPrice"
+  );
 
 const productDescription =
-  document.getElementById("productDescription");
+  document.getElementById(
+    "productDescription"
+  );
 
 const productMessage =
-  document.getElementById("productMessage");
+  document.getElementById(
+    "productMessage"
+  );
 
 const saveProductButton =
-  document.getElementById("saveProductButton");
+  document.getElementById(
+    "saveProductButton"
+  );
 
 const productsGrid =
-  document.getElementById("productsGrid");
+  document.getElementById(
+    "productsGrid"
+  );
 
 const emptyProducts =
-  document.getElementById("emptyProducts");
+  document.getElementById(
+    "emptyProducts"
+  );
 
 const detailModal =
-  document.getElementById("detailModal");
+  document.getElementById(
+    "detailModal"
+  );
 
 const closeDetailModal =
-  document.getElementById("closeDetailModal");
+  document.getElementById(
+    "closeDetailModal"
+  );
 
 const detailContent =
-  document.getElementById("detailContent");
+  document.getElementById(
+    "detailContent"
+  );
 
 const generationMessage =
-  document.getElementById("generationMessage");
+  document.getElementById(
+    "generationMessage"
+  );
+
+
+/* =====================================================
+   ÉLÉMENTS ÉDITION IA
+===================================================== */
+
+const aiEditorPanel =
+  document.getElementById(
+    "aiEditorPanel"
+  );
+
+const aiEditorTitle =
+  document.getElementById(
+    "aiEditorTitle"
+  );
+
+const aiEditorSubtitle =
+  document.getElementById(
+    "aiEditorSubtitle"
+  );
+
+const aiStyle =
+  document.getElementById(
+    "aiStyle"
+  );
+
+const aiFormat =
+  document.getElementById(
+    "aiFormat"
+  );
+
+const aiInstructions =
+  document.getElementById(
+    "aiInstructions"
+  );
+
+const prepareAiGeneration =
+  document.getElementById(
+    "prepareAiGeneration"
+  );
+
+const closeAiEditor =
+  document.getElementById(
+    "closeAiEditor"
+  );
+
+const closeAiEditorBottom =
+  document.getElementById(
+    "closeAiEditorBottom"
+  );
+
+const aiGenerationPreview =
+  document.getElementById(
+    "aiGenerationPreview"
+  );
+
+const generationHistory =
+  document.getElementById(
+    "generationHistory"
+  );
 
 
 /* =====================================================
@@ -121,7 +237,9 @@ function setAuthMode(mode) {
 loginTab.addEventListener(
   "click",
   function () {
+
     setAuthMode("login");
+
   }
 );
 
@@ -129,7 +247,9 @@ loginTab.addEventListener(
 signupTab.addEventListener(
   "click",
   function () {
+
     setAuthMode("signup");
+
   }
 );
 
@@ -141,11 +261,26 @@ signupTab.addEventListener(
 function escapeHtml(value) {
 
   return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
 }
 
 
@@ -189,16 +324,18 @@ authForm.addEventListener(
           data,
           error
         } =
-          await supabaseClient.auth.signInWithPassword({
-            email: email,
-            password: password
-          });
+          await supabaseClient.auth
+            .signInWithPassword({
+              email: email,
+              password: password
+            });
 
         if (error) {
           throw error;
         }
 
-        currentUser = data.user;
+        currentUser =
+          data.user;
 
         await showDashboard();
 
@@ -208,10 +345,11 @@ authForm.addEventListener(
           data,
           error
         } =
-          await supabaseClient.auth.signUp({
-            email: email,
-            password: password
-          });
+          await supabaseClient.auth
+            .signUp({
+              email: email,
+              password: password
+            });
 
         if (error) {
           throw error;
@@ -219,7 +357,8 @@ authForm.addEventListener(
 
         if (data.session) {
 
-          currentUser = data.user;
+          currentUser =
+            data.user;
 
           await showDashboard();
 
@@ -227,6 +366,7 @@ authForm.addEventListener(
 
           authMessage.textContent =
             "Compte créé ! Vérifie ton e-mail si une confirmation est demandée.";
+
         }
       }
 
@@ -239,7 +379,9 @@ authForm.addEventListener(
 
     } finally {
 
-      authButton.disabled = false;
+      authButton.disabled =
+        false;
+
     }
   }
 );
@@ -258,14 +400,18 @@ function getAuthErrorMessage(error) {
     message.toLowerCase();
 
   if (
-    lower.includes("invalid login credentials")
+    lower.includes(
+      "invalid login credentials"
+    )
   ) {
 
     return "E-mail ou mot de passe incorrect.";
   }
 
   if (
-    lower.includes("user already registered")
+    lower.includes(
+      "user already registered"
+    )
   ) {
 
     return "Cette adresse e-mail possède déjà un compte.";
@@ -291,17 +437,25 @@ function getAuthErrorMessage(error) {
 
 function showAuth() {
 
-  authScreen.classList.remove("hidden");
+  authScreen.classList.remove(
+    "hidden"
+  );
 
-  dashboard.classList.add("hidden");
+  dashboard.classList.add(
+    "hidden"
+  );
 }
 
 
 async function showDashboard() {
 
-  authScreen.classList.add("hidden");
+  authScreen.classList.add(
+    "hidden"
+  );
 
-  dashboard.classList.remove("hidden");
+  dashboard.classList.remove(
+    "hidden"
+  );
 
   await loadCategories();
 
@@ -319,7 +473,8 @@ async function checkSession() {
     data,
     error
   } =
-    await supabaseClient.auth.getSession();
+    await supabaseClient.auth
+      .getSession();
 
   if (error) {
 
@@ -340,6 +495,7 @@ async function checkSession() {
   } else {
 
     showAuth();
+
   }
 }
 
@@ -352,11 +508,13 @@ logoutButton.addEventListener(
   "click",
   async function () {
 
-    await supabaseClient.auth.signOut();
+    await supabaseClient.auth
+      .signOut();
 
     currentUser = null;
 
     showAuth();
+
   }
 );
 
@@ -374,9 +532,12 @@ async function loadCategories() {
     await supabaseClient
       .from("categories")
       .select("*")
-      .order("name", {
-        ascending: true
-      });
+      .order(
+        "name",
+        {
+          ascending: true
+        }
+      );
 
   if (error) {
 
@@ -398,7 +559,9 @@ async function loadCategories() {
     function (category) {
 
       const option =
-        document.createElement("option");
+        document.createElement(
+          "option"
+        );
 
       option.value =
         category.id;
@@ -409,6 +572,7 @@ async function loadCategories() {
       productCategory.appendChild(
         option
       );
+
     }
   );
 }
@@ -418,26 +582,32 @@ async function loadCategories() {
    MODALE PRODUIT
 ===================================================== */
 
-let editingProduct = null;
+function openProductModal(
+  product = null
+) {
 
-
-function openProductModal(product = null) {
-
-  productModal.classList.remove("hidden");
+  productModal.classList.remove(
+    "hidden"
+  );
 
   productForm.reset();
 
-  productMessage.textContent = "";
+  productMessage.textContent =
+    "";
 
-  editingProduct = product;
+  editingProduct =
+    product;
 
-  productPhoto.required = !product;
+  productPhoto.required =
+    !product;
+
 
   if (product) {
 
     productModal
       .querySelector("h2")
-      .textContent = "Modifier le produit";
+      .textContent =
+        "Modifier le produit";
 
     saveProductButton.textContent =
       "Enregistrer les modifications";
@@ -451,9 +621,14 @@ function openProductModal(product = null) {
     productPrice.value =
       product.price !== null &&
       product.price !== undefined
-        ? Number(product.price)
+        ? Number(
+            product.price
+          )
             .toFixed(2)
-            .replace(".", ",")
+            .replace(
+              ".",
+              ","
+            )
         : "";
 
     productDescription.value =
@@ -467,32 +642,51 @@ function openProductModal(product = null) {
 
     productModal
       .querySelector("h2")
-      .textContent = "Créer un produit";
+      .textContent =
+        "Créer un produit";
 
     saveProductButton.textContent =
       "Créer le produit";
 
     photoPreview.innerHTML =
-      "<span>📷</span><p>Sélectionne une photo</p>";
+      "<span>📷</span>" +
+      "<p>Sélectionne une photo</p>";
+
   }
 }
 
 
 function closeProductCreationModal() {
 
-  productModal.classList.add("hidden");
+  productModal.classList.add(
+    "hidden"
+  );
+
+  editingProduct =
+    null;
+
+  productPhoto.required =
+    true;
 }
 
 
 newProductButton.addEventListener(
   "click",
-  openProductModal
+  function () {
+
+    openProductModal();
+
+  }
 );
 
 
 emptyNewProductButton.addEventListener(
   "click",
-  openProductModal
+  function () {
+
+    openProductModal();
+
+  }
 );
 
 
@@ -522,7 +716,8 @@ productPhoto.addEventListener(
     if (!file) {
 
       photoPreview.innerHTML =
-        "<span>📷</span><p>Sélectionne une photo</p>";
+        "<span>📷</span>" +
+        "<p>Sélectionne une photo</p>";
 
       return;
     }
@@ -532,10 +727,12 @@ productPhoto.addEventListener(
       10 * 1024 * 1024
     ) {
 
-      productPhoto.value = "";
+      productPhoto.value =
+        "";
 
       photoPreview.innerHTML =
-        "<span>⚠️</span><p>La photo dépasse 10 Mo.</p>";
+        "<span>⚠️</span>" +
+        "<p>La photo dépasse 10 Mo.</p>";
 
       return;
     }
@@ -554,6 +751,7 @@ productPhoto.addEventListener(
       };
 
     reader.readAsDataURL(file);
+
   }
 );
 
@@ -562,7 +760,9 @@ productPhoto.addEventListener(
    EXTENSION PHOTO
 ===================================================== */
 
-function getFileExtension(filename) {
+function getFileExtension(
+  filename
+) {
 
   const parts =
     filename.split(".");
@@ -578,7 +778,7 @@ function getFileExtension(filename) {
 
 
 /* =====================================================
-   CRÉER UN PRODUIT
+   CRÉER / MODIFIER UN PRODUIT
 ===================================================== */
 
 productForm.addEventListener(
@@ -602,99 +802,133 @@ productForm.addEventListener(
       productName.value.trim();
 
     const categoryId =
-      productCategory.value || null;
-
+      productCategory.value ||
+      null;
 
     const priceText =
-  productPrice.value
-    .trim()
-    .replace(",", ".");
+      productPrice.value
+        .trim()
+        .replace(
+          ",",
+          "."
+        );
 
-const price =
-  priceText !== ""
-    ? Number(priceText)
-    : null;
-    
+    const price =
+      priceText !== ""
+        ? Number(priceText)
+        : null;
+
+
     if (
-  price !== null &&
-  (!Number.isFinite(price) || price < 0)
-) {
+      price !== null &&
+      (
+        !Number.isFinite(price) ||
+        price < 0
+      )
+    ) {
 
-  productMessage.textContent =
-    "Indique un prix valide, par exemple 4,90 €.";
+      productMessage.textContent =
+        "Indique un prix valide, par exemple 4,90 €.";
 
-  return;
-}
+      return;
+    }
+
+
+    /* =========================
+       MODIFICATION
+    ========================== */
 
     if (editingProduct) {
 
-  saveProductButton.disabled = true;
+      saveProductButton.disabled =
+        true;
 
-  saveProductButton.textContent =
-    "Modification en cours...";
+      saveProductButton.textContent =
+        "Modification en cours...";
 
-  try {
+      try {
 
-    const {
-      error
-    } =
-      await supabaseClient
-        .from("products")
-        .update({
-          name: name,
-          category_id: categoryId,
-          price: price,
-          description: productDescription.value.trim()
-        })
-        .eq(
-          "id",
-          editingProduct.id
-        )
-        .eq(
-          "user_id",
-          currentUser.id
+        const {
+          error
+        } =
+          await supabaseClient
+            .from("products")
+            .update({
+
+              name:
+                name,
+
+              category_id:
+                categoryId,
+
+              price:
+                price,
+
+              description:
+                productDescription
+                  .value
+                  .trim()
+
+            })
+            .eq(
+              "id",
+              editingProduct.id
+            )
+            .eq(
+              "user_id",
+              currentUser.id
+            );
+
+        if (error) {
+          throw error;
+        }
+
+        productMessage.textContent =
+          "Produit modifié avec succès ✨";
+
+        editingProduct =
+          null;
+
+        await loadProducts();
+
+        setTimeout(
+          function () {
+
+            closeProductCreationModal();
+
+          },
+          700
         );
 
-    if (error) {
-      throw error;
+      } catch (error) {
+
+        console.error(
+          "Erreur modification produit :",
+          error
+        );
+
+        productMessage.textContent =
+          error?.message ||
+          "Impossible de modifier le produit.";
+
+      } finally {
+
+        saveProductButton.disabled =
+          false;
+
+        saveProductButton.textContent =
+          "Enregistrer les modifications";
+
+      }
+
+      return;
     }
 
-    productMessage.textContent =
-      "Produit modifié avec succès ✨";
 
-    editingProduct = null;
+    /* =========================
+       CRÉATION
+    ========================== */
 
-    await loadProducts();
-
-    setTimeout(
-      function () {
-        closeProductCreationModal();
-      },
-      700
-    );
-
-  } catch (error) {
-
-    console.error(
-      "Erreur modification produit :",
-      error
-    );
-
-    productMessage.textContent =
-      error?.message ||
-      "Impossible de modifier le produit.";
-
-  } finally {
-
-    saveProductButton.disabled = false;
-
-    saveProductButton.textContent =
-      "Enregistrer les modifications";
-  }
-
-  return;
-}
-    
     const description =
       productDescription.value.trim();
 
@@ -791,8 +1025,12 @@ const price =
             filePath,
             file,
             {
-              cacheControl: "3600",
-              upsert: true,
+              cacheControl:
+                "3600",
+
+              upsert:
+                true,
+
               contentType:
                 file.type
             }
@@ -890,7 +1128,6 @@ const price =
         error?.message ||
         "Impossible de créer le produit.";
 
-
     } finally {
 
       saveProductButton.disabled =
@@ -898,6 +1135,7 @@ const price =
 
       saveProductButton.textContent =
         "Créer le produit";
+
     }
   }
 );
@@ -907,7 +1145,9 @@ const price =
    URL SIGNÉE PHOTO PRIVÉE
 ===================================================== */
 
-async function getSignedImageUrl(path) {
+async function getSignedImageUrl(
+  path
+) {
 
   if (!path) {
     return null;
@@ -937,7 +1177,8 @@ async function getSignedImageUrl(path) {
   }
 
 
-  return data?.signedUrl || null;
+  return data?.signedUrl ||
+    null;
 }
 
 
@@ -953,7 +1194,10 @@ async function loadProducts() {
 
 
   productsGrid.innerHTML =
-    '<div class="empty-state"><div class="empty-icon">⏳</div><p>Chargement des produits...</p></div>';
+    '<div class="empty-state">' +
+    '<div class="empty-icon">⏳</div>' +
+    '<p>Chargement des produits...</p>' +
+    '</div>';
 
 
   const {
@@ -989,7 +1233,10 @@ async function loadProducts() {
     );
 
     productsGrid.innerHTML =
-      '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Impossible de charger les produits.</p></div>';
+      '<div class="empty-state">' +
+      '<div class="empty-icon">⚠️</div>' +
+      '<p>Impossible de charger les produits.</p>' +
+      '</div>';
 
     return;
   }
@@ -1000,7 +1247,8 @@ async function loadProducts() {
     data.length === 0
   ) {
 
-    productsGrid.innerHTML = "";
+    productsGrid.innerHTML =
+      "";
 
     emptyProducts.classList.remove(
       "hidden"
@@ -1014,7 +1262,8 @@ async function loadProducts() {
     "hidden"
   );
 
-  productsGrid.innerHTML = "";
+  productsGrid.innerHTML =
+    "";
 
 
   for (
@@ -1037,7 +1286,8 @@ async function loadProducts() {
       product.price !== undefined
         ? Number(
             product.price
-          ).toFixed(2) + " €"
+          ).toFixed(2) +
+          " €"
         : "Prix non défini";
 
 
@@ -1050,7 +1300,9 @@ async function loadProducts() {
       "product-card";
 
 
-    let imageHtml = "";
+    let imageHtml =
+      "";
+
 
     if (imageUrl) {
 
@@ -1067,6 +1319,7 @@ async function loadProducts() {
 
       imageHtml =
         '<div class="product-image" style="display:flex;align-items:center;justify-content:center;font-size:45px">📦</div>';
+
     }
 
 
@@ -1093,50 +1346,55 @@ async function loadProducts() {
 
       '<div class="product-card-actions">' +
 
-'<button class="primary-button">' +
-"Ouvrir" +
-"</button>" +
+      '<button class="primary-button">' +
+      "Ouvrir" +
+      "</button>" +
 
-'<button class="secondary-button edit-product-button" type="button">' +
-"✏️ Modifier" +
-"</button>" +
+      '<button class="secondary-button edit-product-button" type="button">' +
+      "✏️ Modifier" +
+      "</button>" +
 
-"</div>" +
+      "</div>" +
 
       "</div>";
 
 
     card
-  .querySelector(".primary-button")
-  .addEventListener(
-    "click",
-    function () {
+      .querySelector(
+        ".primary-button"
+      )
+      .addEventListener(
+        "click",
+        function () {
 
-      openProductDetail(
-        product
+          openProductDetail(
+            product
+          );
+
+        }
       );
 
-    }
-  );
 
+    card
+      .querySelector(
+        ".edit-product-button"
+      )
+      .addEventListener(
+        "click",
+        function () {
 
-card
-  .querySelector(".edit-product-button")
-  .addEventListener(
-    "click",
-    function () {
+          openProductModal(
+            product
+          );
 
-      openProductModal(
-        product
+        }
       );
-
-    }
-  );
 
 
     productsGrid.appendChild(
       card
     );
+
   }
 }
 
@@ -1159,8 +1417,15 @@ async function openProductDetail(
   generationMessage.textContent =
     "";
 
+  aiEditorPanel.classList.add(
+    "hidden"
+  );
+
   detailContent.innerHTML =
-    '<div class="empty-state"><div class="empty-icon">⏳</div><p>Chargement...</p></div>';
+    '<div class="empty-state">' +
+    '<div class="empty-icon">⏳</div>' +
+    '<p>Chargement...</p>' +
+    '</div>';
 
 
   const imageUrl =
@@ -1179,11 +1444,14 @@ async function openProductDetail(
     product.price !== undefined
       ? Number(
           product.price
-        ).toFixed(2) + " €"
+        ).toFixed(2) +
+        " €"
       : "Prix non défini";
 
 
-  let imageHtml = "";
+  let imageHtml =
+    "";
+
 
   if (imageUrl) {
 
@@ -1200,6 +1468,7 @@ async function openProductDetail(
 
     imageHtml =
       '<div class="detail-product-image" style="min-height:250px;display:flex;align-items:center;justify-content:center;font-size:70px">📦</div>';
+
   }
 
 
@@ -1236,28 +1505,155 @@ async function openProductDetail(
     '</div>' +
 
     '</div>';
+
+
+  await prepareAiPreview(
+    imageUrl
+  );
+
+  await loadGenerationHistory();
+
 }
 
 
 /* =====================================================
-   FERMER DÉTAIL
+   APERÇU IA DU PRODUIT
 ===================================================== */
 
-closeDetailModal.addEventListener(
-  "click",
-  function () {
+async function prepareAiPreview(
+  imageUrl
+) {
 
-    detailModal.classList.add(
-      "hidden"
-    );
-
-    currentProduct = null;
+  if (!aiGenerationPreview) {
+    return;
   }
-);
+
+  if (!imageUrl) {
+
+    aiGenerationPreview.innerHTML =
+      "<span>📦</span>" +
+      "<p>Photo indisponible</p>";
+
+    return;
+  }
+
+  aiGenerationPreview.innerHTML =
+    '<img src="' +
+    imageUrl +
+    '" alt="Produit source">';
+
+}
 
 
 /* =====================================================
-   OUTILS DE GÉNÉRATION
+   OUVRIR ÉDITEUR IA
+===================================================== */
+
+const generationLabels = {
+
+  mockup: {
+
+    title:
+      "🖼️ Version Mockup",
+
+    subtitle:
+      "Présente ton produit comme dans un catalogue professionnel."
+
+  },
+
+  promotion: {
+
+    title:
+      "📣 Fiche promotionnelle",
+
+    subtitle:
+      "Prépare un visuel publicitaire clair et attractif."
+
+  },
+
+  vente: {
+
+    title:
+      "🛍️ Image de vente",
+
+    subtitle:
+      "Crée le visuel principal destiné à donner envie d’acheter."
+
+  },
+
+  decor: {
+
+    title:
+      "🏡 Exemple dans un décor",
+
+    subtitle:
+      "Montre le produit personnalisé dans une scène réaliste."
+
+  }
+
+};
+
+
+function openAiEditor(
+  type
+) {
+
+  if (!currentProduct) {
+
+    generationMessage.textContent =
+      "Aucun produit sélectionné.";
+
+    return;
+  }
+
+
+  const label =
+    generationLabels[type];
+
+
+  if (!label) {
+    return;
+  }
+
+
+  selectedGenerationType =
+    type;
+
+
+  aiEditorTitle.textContent =
+    label.title;
+
+  aiEditorSubtitle.textContent =
+    label.subtitle;
+
+
+  aiInstructions.value =
+    "";
+
+
+  aiStyle.value =
+    "professionnel";
+
+
+  aiFormat.value =
+    "carre";
+
+
+  aiEditorPanel.classList.remove(
+    "hidden"
+  );
+
+
+  aiEditorPanel.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+
+}
+
+
+/* =====================================================
+   BOUTONS DES 4 OUTILS
 ===================================================== */
 
 document
@@ -1269,107 +1665,444 @@ document
 
       button.addEventListener(
         "click",
-        async function () {
+        function () {
 
-          if (!currentProduct) {
+          openAiEditor(
+            button.dataset.generation
+          );
 
-            generationMessage.textContent =
-              "Aucun produit sélectionné.";
-
-            return;
-          }
-
-
-          const type =
-            button.dataset.generation;
-
-
-          const labels = {
-
-            mockup:
-              "Générer un mockup",
-
-            fiche:
-              "Créer une fiche produit",
-
-            promotion:
-              "Créer une fiche promotionnelle",
-
-            presentation:
-              "Créer une présentation"
-
-          };
-
-
-          button.disabled = true;
-
-
-          generationMessage.textContent =
-            "Préparation du visuel...";
-
-
-          try {
-
-            const {
-              error
-            } =
-              await supabaseClient
-                .from(
-                  "design_generations"
-                )
-                .insert({
-
-                  product_id:
-                    currentProduct.id,
-
-                  user_id:
-                    currentUser.id,
-
-                  generation_type:
-                    type,
-
-                  prompt:
-                    labels[type] ||
-                    "Créer un visuel",
-
-                  result_url:
-                    null
-
-                });
-
-
-            if (error) {
-              throw error;
-            }
-
-
-            generationMessage.textContent =
-              (
-                labels[type] ||
-                "Visuel"
-              ) +
-              " enregistré ✨";
-
-
-          } catch (error) {
-
-            console.error(
-              error
-            );
-
-            generationMessage.textContent =
-              "Une erreur est survenue.";
-
-
-          } finally {
-
-            button.disabled =
-              false;
-          }
         }
       );
+
     }
   );
+
+
+/* =====================================================
+   FERMER ÉDITEUR IA
+===================================================== */
+
+function closeAiEditorPanel() {
+
+  aiEditorPanel.classList.add(
+    "hidden"
+  );
+
+  selectedGenerationType =
+    null;
+
+  generationMessage.textContent =
+    "";
+}
+
+
+closeAiEditor.addEventListener(
+  "click",
+  closeAiEditorPanel
+);
+
+
+closeAiEditorBottom.addEventListener(
+  "click",
+  closeAiEditorPanel
+);
+
+
+/* =====================================================
+   CONSTRUCTION DU PROMPT
+===================================================== */
+
+function buildGenerationPrompt() {
+
+  if (!currentProduct) {
+    return "";
+  }
+
+
+  const type =
+    generationLabels[
+      selectedGenerationType
+    ];
+
+
+  const styleText =
+    aiStyle.options[
+      aiStyle.selectedIndex
+    ]?.text ||
+    "";
+
+
+  const formatText =
+    aiFormat.options[
+      aiFormat.selectedIndex
+    ]?.text ||
+    "";
+
+
+  const customInstructions =
+    aiInstructions.value.trim();
+
+
+  let prompt =
+    "Produit : " +
+    currentProduct.name +
+    ". ";
+
+
+  prompt +=
+    "Type de visuel : " +
+    (type?.title || "") +
+    ". ";
+
+
+  prompt +=
+    "Style : " +
+    styleText +
+    ". ";
+
+
+  prompt +=
+    "Format : " +
+    formatText +
+    ". ";
+
+
+  if (
+    currentProduct.description
+  ) {
+
+    prompt +=
+      "Description du produit : " +
+      currentProduct.description +
+      ". ";
+
+  }
+
+
+  if (
+    customInstructions
+  ) {
+
+    prompt +=
+      "Consignes supplémentaires : " +
+      customInstructions;
+
+  }
+
+
+  return prompt;
+}
+
+
+/* =====================================================
+   PRÉPARER UNE GÉNÉRATION
+===================================================== */
+
+prepareAiGeneration.addEventListener(
+  "click",
+  async function () {
+
+    if (!currentProduct) {
+
+      generationMessage.textContent =
+        "Aucun produit sélectionné.";
+
+      return;
+    }
+
+
+    if (!currentUser) {
+
+      generationMessage.textContent =
+        "Ta session a expiré. Reconnecte-toi.";
+
+      return;
+    }
+
+
+    if (!selectedGenerationType) {
+
+      generationMessage.textContent =
+        "Choisis d'abord un type de visuel.";
+
+      return;
+    }
+
+
+    const prompt =
+      buildGenerationPrompt();
+
+
+    prepareAiGeneration.disabled =
+      true;
+
+    prepareAiGeneration.textContent =
+      "Préparation...";
+
+
+    generationMessage.textContent =
+      "Enregistrement de ta demande IA...";
+
+
+    try {
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from(
+            "design_generations"
+          )
+          .insert({
+
+            product_id:
+              currentProduct.id,
+
+            user_id:
+              currentUser.id,
+
+            generation_type:
+              selectedGenerationType,
+
+            prompt:
+              prompt,
+
+            result_url:
+              null
+
+          });
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      generationMessage.textContent =
+        "Demande enregistrée ✨";
+
+
+      await loadGenerationHistory();
+
+
+      aiInstructions.value =
+        "";
+
+
+      setTimeout(
+        function () {
+
+          generationMessage.textContent =
+            "Ta demande est prête pour le moteur IA.";
+
+        },
+        700
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Erreur génération IA :",
+        error
+      );
+
+      generationMessage.textContent =
+        error?.message ||
+        "Impossible d'enregistrer la demande.";
+
+    } finally {
+
+      prepareAiGeneration.disabled =
+        false;
+
+      prepareAiGeneration.textContent =
+        "✨ Préparer le visuel";
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   HISTORIQUE DES GÉNÉRATIONS
+===================================================== */
+
+async function loadGenerationHistory() {
+
+  if (
+    !currentProduct ||
+    !currentUser
+  ) {
+
+    return;
+  }
+
+
+  generationHistory.innerHTML =
+    '<div class="history-empty">' +
+    'Chargement de l’historique...' +
+    '</div>';
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "design_generations"
+      )
+      .select("*")
+      .eq(
+        "product_id",
+        currentProduct.id
+      )
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erreur historique :",
+      error
+    );
+
+    generationHistory.innerHTML =
+      '<div class="history-empty">' +
+      'Impossible de charger l’historique.' +
+      '</div>';
+
+    return;
+  }
+
+
+  if (
+    !data ||
+    data.length === 0
+  ) {
+
+    generationHistory.innerHTML =
+      '<div class="history-empty">' +
+      'Aucune demande pour le moment.' +
+      '</div>';
+
+    return;
+  }
+
+
+  generationHistory.innerHTML =
+    "";
+
+
+  data.forEach(
+    function (generation) {
+
+      const type =
+        generationLabels[
+          generation.generation_type
+        ];
+
+
+      const title =
+        type?.title ||
+        generation.generation_type ||
+        "Visuel";
+
+
+      const date =
+        generation.created_at
+          ? new Date(
+              generation.created_at
+            ).toLocaleString(
+              "fr-FR"
+            )
+          : "";
+
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+      item.className =
+        "history-item";
+
+
+      item.innerHTML =
+
+        '<div>' +
+
+        '<strong>' +
+        escapeHtml(
+          title
+        ) +
+        '</strong>' +
+
+        '<small>' +
+        escapeHtml(
+          date
+        ) +
+        '</small>' +
+
+        '</div>' +
+
+        '<span class="history-status">' +
+        (
+          generation.result_url
+            ? "Disponible"
+            : "En attente"
+        ) +
+        '</span>';
+
+
+      generationHistory.appendChild(
+        item
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   FERMER DÉTAIL
+===================================================== */
+
+function closeDetailProductModal() {
+
+  detailModal.classList.add(
+    "hidden"
+  );
+
+  currentProduct =
+    null;
+
+  selectedGenerationType =
+    null;
+
+  aiEditorPanel.classList.add(
+    "hidden"
+  );
+
+}
+
+
+closeDetailModal.addEventListener(
+  "click",
+  closeDetailProductModal
+);
 
 
 /* =====================================================
@@ -1386,7 +2119,9 @@ productModal.addEventListener(
     ) {
 
       closeProductCreationModal();
+
     }
+
   }
 );
 
@@ -1400,12 +2135,10 @@ detailModal.addEventListener(
       detailModal
     ) {
 
-      detailModal.classList.add(
-        "hidden"
-      );
+      closeDetailProductModal();
 
-      currentProduct = null;
     }
+
   }
 );
 
@@ -1415,7 +2148,10 @@ detailModal.addEventListener(
 ===================================================== */
 
 supabaseClient.auth.onAuthStateChange(
-  function (event, session) {
+  function (
+    event,
+    session
+  ) {
 
     if (
       event === "SIGNED_IN" &&
@@ -1424,6 +2160,7 @@ supabaseClient.auth.onAuthStateChange(
 
       currentUser =
         session.user;
+
     }
 
 
@@ -1431,10 +2168,13 @@ supabaseClient.auth.onAuthStateChange(
       event === "SIGNED_OUT"
     ) {
 
-      currentUser = null;
+      currentUser =
+        null;
 
       showAuth();
+
     }
+
   }
 );
 

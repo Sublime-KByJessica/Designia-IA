@@ -289,4 +289,155 @@
             Choisir une catégorie
           </option>
 
-        </
+        </select>
+
+
+        <label for="productPrice">
+          Prix (€)
+        </label>
+
+        <input
+          id="productPrice"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="Ex. 12.90"
+        >
+
+
+        <label for="productDescription">
+          Description
+        </label>
+
+        <textarea
+          id="productDescription"
+          rows="4"
+          placeholder="Décris ton produit..."
+        ></textarea>
+
+
+        <p
+          id="productMessage"
+          class="message"
+        ></p>
+
+
+        <div class="modal-actions">
+
+          <button
+            id="cancelProductButton"
+            class="secondary-button"
+            type="button"
+          >
+            Annuler
+          </button>
+
+          <button
+            id="saveProductButton"
+            class="primary-button"
+            type="submit"
+          >
+            Créer le produit
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       MODALE DÉTAIL PRODUIT
+  ========================== -->
+
+  <div
+    id="detailModal"
+    class="modal hidden"
+  >
+
+    <div class="modal-content large-modal">
+
+      <button
+        id="closeDetailModal"
+        class="modal-close"
+        type="button"
+      >
+        ×
+      </button>
+
+
+      <div
+        id="detailContent"
+      ></div>
+
+
+      <div class="generation-tools">
+
+        <h3>
+          Créer un visuel
+        </h3>
+
+
+        <div class="tool-grid">
+
+          <button
+            class="tool-button"
+            data-generation="mockup"
+            type="button"
+          >
+            🖼️ Mockup
+          </button>
+
+
+          <button
+            class="tool-button"
+            data-generation="fiche"
+            type="button"
+          >
+            📄 Fiche produit
+          </button>
+
+
+          <button
+            class="tool-button"
+            data-generation="promotion"
+            type="button"
+          >
+            📣 Fiche promotionnelle
+          </button>
+
+
+          <button
+            class="tool-button"
+            data-generation="presentation"
+            type="button"
+          >
+            ✨ Présentation
+          </button>
+
+        </div>
+
+
+        <p
+          id="generationMessage"
+          class="message"
+        ></p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       JAVASCRIPT
+  ========================== -->
+
+  <script src="app.js"></script>
+
+</body>
+</html>

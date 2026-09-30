@@ -206,6 +206,44 @@ const generationHistory =
     "generationHistory"
   );
 
+/* =====================================================
+   ÉLÉMENTS APERÇU PERSONNALISATION
+===================================================== */
+
+const openPersonalizationButton =
+  document.getElementById(
+    "openPersonalizationButton"
+  );
+
+const personalizationPanel =
+  document.getElementById(
+    "personalizationPanel"
+  );
+
+const closePersonalization =
+  document.getElementById(
+    "closePersonalization"
+  );
+
+const personalizationPreview =
+  document.getElementById(
+    "personalizationPreview"
+  );
+
+const personalizationText =
+  document.getElementById(
+    "personalizationText"
+  );
+
+const personalizationColor =
+  document.getElementById(
+    "personalizationColor"
+  );
+
+const personalizationFont =
+  document.getElementById(
+    "personalizationFont"
+  );
 
 /* =====================================================
    CONNEXION / INSCRIPTION
@@ -1658,7 +1696,7 @@ function openAiEditor(
 
 document
   .querySelectorAll(
-    ".tool-button"
+    ".tool-button[data-generation]"
   )
   .forEach(
     function (button) {
@@ -1677,6 +1715,161 @@ document
     }
   );
 
+/* =====================================================
+   APERÇU PERSONNALISATION
+===================================================== */
+
+let personalizationImageUrl = null;
+
+
+function updatePersonalizationPreview() {
+
+  if (!personalizationPreview) {
+    return;
+  }
+
+  if (!personalizationImageUrl) {
+
+    personalizationPreview.innerHTML =
+      "<span>📷</span>" +
+      "<p>Photo du produit indisponible</p>";
+
+    return;
+  }
+
+  const text =
+    personalizationText?.value.trim() || "";
+
+  const color =
+    personalizationColor?.value || "#d98fa6";
+
+  const font =
+    personalizationFont?.value || "Arial";
+
+
+  personalizationPreview.innerHTML =
+    '<div class="personalization-image-wrap">' +
+
+    '<img ' +
+    'src="' +
+    personalizationImageUrl +
+    '" ' +
+    'alt="Aperçu du produit" ' +
+    'class="personalization-product-image">' +
+
+    '<span ' +
+    'class="personalization-text-overlay" ' +
+    'style="color:' +
+    color +
+    ';font-family:' +
+    font +
+    ';">' +
+    escapeHtml(text) +
+    '</span>' +
+
+    '</div>';
+
+}
+
+
+async function openPersonalizationPreview() {
+
+  if (!currentProduct) {
+
+    generationMessage.textContent =
+      "Aucun produit sélectionné.";
+
+    return;
+  }
+
+  personalizationPanel.classList.remove(
+    "hidden"
+  );
+
+  personalizationText.value =
+    "";
+
+  personalizationColor.value =
+    "#d98fa6";
+
+  personalizationFont.value =
+    "Arial";
+
+  personalizationImageUrl =
+    await getSignedImageUrl(
+      currentProduct.photo_url
+    );
+
+  updatePersonalizationPreview();
+
+  personalizationPanel.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+
+}
+
+
+function closePersonalizationPreview() {
+
+  personalizationPanel.classList.add(
+    "hidden"
+  );
+
+  personalizationImageUrl =
+    null;
+
+}
+
+
+if (openPersonalizationButton) {
+
+  openPersonalizationButton.addEventListener(
+    "click",
+    openPersonalizationPreview
+  );
+
+}
+
+
+if (closePersonalization) {
+
+  closePersonalization.addEventListener(
+    "click",
+    closePersonalizationPreview
+  );
+
+}
+
+
+if (personalizationText) {
+
+  personalizationText.addEventListener(
+    "input",
+    updatePersonalizationPreview
+  );
+
+}
+
+
+if (personalizationColor) {
+
+  personalizationColor.addEventListener(
+    "input",
+    updatePersonalizationPreview
+  );
+
+}
+
+
+if (personalizationFont) {
+
+  personalizationFont.addEventListener(
+    "change",
+    updatePersonalizationPreview
+  );
+
+}
 
 /* =====================================================
    FERMER ÉDITEUR IA

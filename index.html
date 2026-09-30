@@ -212,7 +212,7 @@
 
 
   <!-- =========================
-       MODALE CRÉATION PRODUIT
+       MODALE CRÉATION / MODIFICATION
   ========================== -->
 
   <div
@@ -296,13 +296,13 @@
           Prix (€)
         </label>
 
-  <input
-  id="productPrice"
-  type="text"
-  inputmode="decimal"
-  autocomplete="off"
-  placeholder="Ex. 12,90"
->
+        <input
+          id="productPrice"
+          type="text"
+          inputmode="decimal"
+          autocomplete="off"
+          placeholder="Ex. 12,90"
+        >
 
 
         <label for="productDescription">
@@ -369,16 +369,35 @@
       </button>
 
 
-      <div
-        id="detailContent"
-      ></div>
+      <div id="detailContent"></div>
 
+
+      <!-- =========================
+           ÉDITION IA
+      ========================== -->
 
       <div class="generation-tools">
 
-        <h3>
-          Créer un visuel
-        </h3>
+        <div class="generation-heading">
+
+          <div>
+
+            <span class="generation-badge">
+              ✨ DESIGNIA AI
+            </span>
+
+            <h3>
+              Édition IA
+            </h3>
+
+            <p>
+              Transforme la photo de ton produit
+              en visuel professionnel et vendeur.
+            </p>
+
+          </div>
+
+        </div>
 
 
         <div class="tool-grid">
@@ -388,16 +407,19 @@
             data-generation="mockup"
             type="button"
           >
-            🖼️ Mockup
-          </button>
 
+            <span class="tool-icon">
+              🖼️
+            </span>
 
-          <button
-            class="tool-button"
-            data-generation="fiche"
-            type="button"
-          >
-            📄 Fiche produit
+            <strong>
+              Version Mockup
+            </strong>
+
+            <small>
+              Présentation propre et professionnelle
+            </small>
+
           </button>
 
 
@@ -406,16 +428,61 @@
             data-generation="promotion"
             type="button"
           >
-            📣 Fiche promotionnelle
+
+            <span class="tool-icon">
+              📣
+            </span>
+
+            <strong>
+              Fiche promotionnelle
+            </strong>
+
+            <small>
+              Visuel publicitaire prêt à présenter
+            </small>
+
           </button>
 
 
           <button
             class="tool-button"
-            data-generation="presentation"
+            data-generation="vente"
             type="button"
           >
-            ✨ Présentation
+
+            <span class="tool-icon">
+              🛍️
+            </span>
+
+            <strong>
+              Image de vente
+            </strong>
+
+            <small>
+              Visuel principal pour ta boutique
+            </small>
+
+          </button>
+
+
+          <button
+            class="tool-button"
+            data-generation="decor"
+            type="button"
+          >
+
+            <span class="tool-icon">
+              🏡
+            </span>
+
+            <strong>
+              Exemple dans un décor
+            </strong>
+
+            <small>
+              Produit présenté dans une scène réaliste
+            </small>
+
           </button>
 
         </div>
@@ -425,6 +492,198 @@
           id="generationMessage"
           class="message"
         ></p>
+
+
+        <!-- =========================
+             PANNEAU ÉDITION IA
+        ========================== -->
+
+        <div
+          id="aiEditorPanel"
+          class="ai-editor-panel hidden"
+        >
+
+          <div class="ai-editor-header">
+
+            <div>
+
+              <span class="ai-small-label">
+                PERSONNALISATION
+              </span>
+
+              <h3 id="aiEditorTitle">
+                ✨ Édition IA
+              </h3>
+
+              <p id="aiEditorSubtitle">
+                Prépare ton futur visuel.
+              </p>
+
+            </div>
+
+            <button
+              id="closeAiEditor"
+              class="ai-close-button"
+              type="button"
+            >
+              ×
+            </button>
+
+          </div>
+
+
+          <div class="ai-editor-layout">
+
+            <div class="ai-preview-box">
+
+              <div class="ai-preview-title">
+                Produit source
+              </div>
+
+              <div
+                id="aiGenerationPreview"
+                class="ai-generation-preview"
+              >
+
+                <span>
+                  📷
+                </span>
+
+                <p>
+                  Aperçu du produit
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div class="ai-options">
+
+              <label for="aiStyle">
+                Style visuel
+              </label>
+
+              <select id="aiStyle">
+
+                <option value="professionnel">
+                  Professionnel / lumineux
+                </option>
+
+                <option value="naturel">
+                  Naturel / chaleureux
+                </option>
+
+                <option value="premium">
+                  Premium / élégant
+                </option>
+
+                <option value="colore">
+                  Coloré / dynamique
+                </option>
+
+                <option value="minimaliste">
+                  Minimaliste / épuré
+                </option>
+
+              </select>
+
+
+              <label for="aiFormat">
+                Format du visuel
+              </label>
+
+              <select id="aiFormat">
+
+                <option value="carre">
+                  Carré / boutique / Instagram
+                </option>
+
+                <option value="portrait">
+                  Portrait / réseaux sociaux
+                </option>
+
+                <option value="paysage">
+                  Paysage / présentation
+                </option>
+
+              </select>
+
+
+              <label for="aiInstructions">
+                Consigne personnalisée
+              </label>
+
+              <textarea
+                id="aiInstructions"
+                rows="5"
+                placeholder="Ex. Fond beige clair, ambiance douce, quelques fleurs séchées, rendu haut de gamme..."
+              ></textarea>
+
+
+              <div class="ai-info-box">
+                💡 <strong>Conseil :</strong>
+                décris surtout l'ambiance, le décor,
+                la lumière et les éléments que tu souhaites
+                autour du produit.
+              </div>
+
+
+              <div class="ai-editor-actions">
+
+                <button
+                  id="closeAiEditorBottom"
+                  class="secondary-button"
+                  type="button"
+                >
+                  Annuler
+                </button>
+
+                <button
+                  id="prepareAiGeneration"
+                  class="primary-button"
+                  type="button"
+                >
+                  ✨ Préparer le visuel
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- =========================
+               HISTORIQUE
+          ========================== -->
+
+          <div class="generation-history">
+
+            <div class="history-heading">
+
+              <div>
+
+                <h4>
+                  Historique des demandes
+                </h4>
+
+                <p>
+                  Les visuels générés seront conservés ici.
+                </p>
+
+              </div>
+
+            </div>
+
+            <div
+              id="generationHistory"
+              class="generation-history-list"
+            ></div>
+
+          </div>
+
+        </div>
 
       </div>
 

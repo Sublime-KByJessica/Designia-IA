@@ -561,6 +561,17 @@ productForm.addEventListener(
       productPrice.value
         ? Number(productPrice.value)
         : null;
+
+    const priceText =
+  productPrice.value
+    .trim()
+    .replace(",", ".");
+
+const price =
+  priceText !== ""
+    ? Number(priceText)
+    : null;
+    
     if (
   price !== null &&
   (!Number.isFinite(price) || price < 0)

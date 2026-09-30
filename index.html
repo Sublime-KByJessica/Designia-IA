@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Designia AI</title>
 
   <link rel="stylesheet" href="style.css">
@@ -13,7 +14,7 @@
 <body>
 
   <!-- =========================
-       ÉCRAN DE CONNEXION
+       CONNEXION / INSCRIPTION
   ========================== -->
 
   <section id="authScreen" class="screen">
@@ -29,13 +30,23 @@
       </p>
 
       <div class="auth-tabs">
-        <button id="loginTab" class="tab active">
+
+        <button
+          id="loginTab"
+          class="tab active"
+          type="button"
+        >
           Connexion
         </button>
 
-        <button id="signupTab" class="tab">
+        <button
+          id="signupTab"
+          class="tab"
+          type="button"
+        >
           Créer un compte
         </button>
+
       </div>
 
       <form id="authForm">
@@ -59,6 +70,7 @@
           id="password"
           type="password"
           placeholder="••••••••"
+          minlength="6"
           required
         >
 
@@ -72,7 +84,10 @@
 
       </form>
 
-      <p id="authMessage" class="message"></p>
+      <p
+        id="authMessage"
+        class="message"
+      ></p>
 
     </div>
 
@@ -83,18 +98,29 @@
        TABLEAU DE BORD
   ========================== -->
 
-  <section id="dashboard" class="screen hidden">
+  <section
+    id="dashboard"
+    class="screen hidden"
+  >
 
     <header class="topbar">
 
       <div>
-        <h1>✨ Designia AI</h1>
-        <p>Ton espace créatif</p>
+
+        <h1>
+          ✨ Designia AI
+        </h1>
+
+        <p>
+          Ton espace créatif
+        </p>
+
       </div>
 
       <button
         id="logoutButton"
         class="secondary-button"
+        type="button"
       >
         Déconnexion
       </button>
@@ -107,6 +133,7 @@
       <div class="welcome-box">
 
         <div>
+
           <h2 id="welcomeTitle">
             Bienvenue 👋
           </h2>
@@ -115,11 +142,13 @@
             Crée tes produits, ajoute tes photos
             et prépare tes visuels.
           </p>
+
         </div>
 
         <button
           id="newProductButton"
           class="primary-button"
+          type="button"
         >
           + Créer un produit
         </button>
@@ -130,10 +159,15 @@
       <div class="section-header">
 
         <div>
-          <h2>Mes produits</h2>
+
+          <h2>
+            Mes produits
+          </h2>
+
           <p>
             Tes derniers produits créés
           </p>
+
         </div>
 
       </div>
@@ -163,4 +197,96 @@
         </p>
 
         <button
-         
+          id="emptyNewProductButton"
+          class="primary-button"
+          type="button"
+        >
+          + Créer mon premier produit
+        </button>
+
+      </div>
+
+    </main>
+
+  </section>
+
+
+  <!-- =========================
+       MODALE CRÉATION PRODUIT
+  ========================== -->
+
+  <div
+    id="productModal"
+    class="modal hidden"
+  >
+
+    <div class="modal-content">
+
+      <button
+        id="closeProductModal"
+        class="modal-close"
+        type="button"
+      >
+        ×
+      </button>
+
+      <h2>
+        Créer un produit
+      </h2>
+
+
+      <form id="productForm">
+
+        <label for="productPhoto">
+          Photo du produit
+        </label>
+
+        <input
+          id="productPhoto"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          required
+        >
+
+
+        <div
+          id="photoPreview"
+          class="photo-preview"
+        >
+
+          <span>
+            📷
+          </span>
+
+          <p>
+            Sélectionne une photo
+          </p>
+
+        </div>
+
+
+        <label for="productName">
+          Nom du produit
+        </label>
+
+        <input
+          id="productName"
+          type="text"
+          placeholder="Ex. Mug personnalisé"
+          required
+        >
+
+
+        <label for="productCategory">
+          Catégorie
+        </label>
+
+        <select
+          id="productCategory"
+        >
+
+          <option value="">
+            Choisir une catégorie
+          </option>
+
+        </

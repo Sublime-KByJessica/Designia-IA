@@ -2497,13 +2497,49 @@ async function loadGenerationHistory() {
           "div"
         );
 
+
       item.className =
         "history-item";
 
 
+      /* =================================================
+         CONTENU DE L'HISTORIQUE
+      ================================================= */
+
+      let preview = "";
+
+
+      if (
+        generation.result_url
+      ) {
+
+        preview =
+          '<img ' +
+          'src="' +
+          generation.result_url +
+          '" ' +
+          'alt="Visuel généré" ' +
+          'class="history-preview-image">';
+
+      } else {
+
+        preview =
+          '<div class="history-preview-empty">' +
+          '⏳' +
+          '</div>';
+
+      }
+
+
       item.innerHTML =
 
-        '<div>' +
+        '<div class="history-preview">' +
+
+        preview +
+
+        '</div>' +
+
+        '<div class="history-item-info">' +
 
         '<strong>' +
         escapeHtml(
@@ -2520,12 +2556,48 @@ async function loadGenerationHistory() {
         '</div>' +
 
         '<span class="history-status">' +
+
         (
           generation.result_url
             ? "Disponible"
             : "En attente"
         ) +
+
         '</span>';
+
+
+      /* =================================================
+         OUVRIR LE VISUEL AU CLIC
+      ================================================= */
+
+      if (
+        generation.result_url
+      ) {
+
+        item.style.cursor =
+          "pointer";
+
+
+        item.addEventListener(
+          "click",
+          function () {
+
+            aiGenerationPreview.innerHTML =
+
+              '<img ' +
+              'src="' +
+              generation.result_url +
+              '" ' +
+              'alt="Visuel généré par IA">';
+
+
+            generationMessage.textContent =
+              "Visuel chargé depuis l’historique ✨";
+
+          }
+        );
+
+      }
 
 
       generationHistory.appendChild(

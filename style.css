@@ -1,0 +1,720 @@
+/* =====================================================
+   DESIGNIA AI
+   STYLE PRINCIPAL
+===================================================== */
+
+:root {
+  --rose: #d98fa5;
+  --rose-clair: #f8e8ed;
+  --sauge: #a8b9a5;
+  --vert-clair: #dce8d8;
+  --kaki: #aeb89d;
+  --beige: #f8f6f1;
+  --blanc: #ffffff;
+  --texte: #3f403b;
+  --texte-clair: #777970;
+  --bordure: #e4e1da;
+  --ombre: 0 10px 30px rgba(70, 70, 60, 0.10);
+  --rayon: 18px;
+}
+
+
+/* =====================================================
+   BASE
+===================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--beige);
+  color: var(--texte);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.hidden {
+  display: none !important;
+}
+
+
+/* =====================================================
+   ÉCRANS
+===================================================== */
+
+.screen {
+  min-height: 100vh;
+}
+
+
+/* =====================================================
+   CONNEXION
+===================================================== */
+
+#authScreen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+  background:
+    radial-gradient(
+      circle at top left,
+      var(--rose-clair),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      var(--vert-clair),
+      transparent 35%
+    ),
+    var(--beige);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  padding: 38px;
+  background: var(--blanc);
+  border: 1px solid var(--bordure);
+  border-radius: 25px;
+  box-shadow: var(--ombre);
+}
+
+.logo {
+  width: 65px;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+  background: var(--rose-clair);
+  border-radius: 50%;
+  font-size: 32px;
+}
+
+.auth-card h1 {
+  margin: 0;
+  text-align: center;
+  font-size: 32px;
+}
+
+.subtitle {
+  margin: 10px 0 30px;
+  text-align: center;
+  color: var(--texte-clair);
+}
+
+
+/* =====================================================
+   ONGLETS CONNEXION
+===================================================== */
+
+.auth-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 25px;
+  padding: 5px;
+  background: var(--beige);
+  border-radius: 12px;
+}
+
+.tab {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--texte-clair);
+  font-weight: 600;
+}
+
+.tab.active {
+  background: var(--blanc);
+  color: var(--rose);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+
+/* =====================================================
+   FORMULAIRES
+===================================================== */
+
+label {
+  display: block;
+  margin: 16px 0 7px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1px solid var(--bordure);
+  border-radius: 11px;
+  outline: none;
+  background: var(--blanc);
+  color: var(--texte);
+  transition: 0.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px var(--rose-clair);
+}
+
+textarea {
+  resize: vertical;
+}
+
+
+/* =====================================================
+   BOUTONS
+===================================================== */
+
+.primary-button,
+.secondary-button {
+  border: none;
+  border-radius: 11px;
+  padding: 12px 18px;
+  font-weight: 700;
+  transition: 0.2s;
+}
+
+.primary-button {
+  background: var(--rose);
+  color: white;
+}
+
+.primary-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+}
+
+.secondary-button {
+  background: var(--vert-clair);
+  color: var(--texte);
+}
+
+.secondary-button:hover {
+  transform: translateY(-1px);
+}
+
+#authButton {
+  width: 100%;
+  margin-top: 25px;
+}
+
+
+/* =====================================================
+   MESSAGES
+===================================================== */
+
+.message {
+  min-height: 20px;
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: var(--rose);
+  text-align: center;
+}
+
+
+/* =====================================================
+   BARRE DU HAUT
+===================================================== */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 5%;
+  background: var(--blanc);
+  border-bottom: 1px solid var(--bordure);
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 25px;
+}
+
+.topbar p {
+  margin: 5px 0 0;
+  color: var(--texte-clair);
+}
+
+
+/* =====================================================
+   CONTENU TABLEAU DE BORD
+===================================================== */
+
+.dashboard-content {
+  width: min(1200px, 90%);
+  margin: 0 auto;
+  padding: 35px 0 60px;
+}
+
+
+/* =====================================================
+   BLOC BIENVENUE
+===================================================== */
+
+.welcome-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  margin-bottom: 40px;
+  padding: 30px;
+  background:
+    linear-gradient(
+      135deg,
+      var(--rose-clair),
+      var(--vert-clair)
+    );
+  border-radius: 22px;
+}
+
+.welcome-box h2 {
+  margin: 0 0 8px;
+  font-size: 27px;
+}
+
+.welcome-box p {
+  margin: 0;
+  color: var(--texte-clair);
+}
+
+
+/* =====================================================
+   TITRES DE SECTION
+===================================================== */
+
+.section-header {
+  margin-bottom: 20px;
+}
+
+.section-header h2 {
+  margin: 0;
+}
+
+.section-header p {
+  margin: 6px 0 0;
+  color: var(--texte-clair);
+}
+
+
+/* =====================================================
+   GRILLE PRODUITS
+===================================================== */
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(220px, 1fr)
+  );
+  gap: 22px;
+}
+
+
+/* =====================================================
+   CARTE PRODUIT
+===================================================== */
+
+.product-card {
+  overflow: hidden;
+  background: var(--blanc);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  box-shadow: 0 5px 18px rgba(70, 70, 60, 0.06);
+  transition: 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--ombre);
+}
+
+.product-image {
+  width: 100%;
+  height: 210px;
+  object-fit: cover;
+  display: block;
+  background: var(--rose-clair);
+}
+
+.product-card-content {
+  padding: 18px;
+}
+
+.product-card-content h3 {
+  margin: 0 0 7px;
+  font-size: 18px;
+}
+
+.product-category {
+  margin: 0 0 10px;
+  color: var(--texte-clair);
+  font-size: 13px;
+}
+
+.product-price {
+  margin: 0 0 15px;
+  color: var(--rose);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.product-card .primary-button {
+  width: 100%;
+}
+
+
+/* =====================================================
+   ÉTAT VIDE
+===================================================== */
+
+.empty-state {
+  padding: 70px 25px;
+  text-align: center;
+  background: var(--blanc);
+  border: 1px dashed var(--bordure);
+  border-radius: 20px;
+}
+
+.empty-icon {
+  margin-bottom: 15px;
+  font-size: 50px;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px;
+}
+
+.empty-state p {
+  margin: 0 0 20px;
+  color: var(--texte-clair);
+}
+
+
+/* =====================================================
+   MODALES
+===================================================== */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(35, 35, 30, 0.55);
+  overflow-y: auto;
+}
+
+.modal-content {
+  position: relative;
+  width: 100%;
+  max-width: 620px;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 30px;
+  background: var(--blanc);
+  border-radius: 22px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.20);
+}
+
+.modal-content h2 {
+  margin: 0 0 8px;
+}
+
+.modal-subtitle {
+  margin: 0 0 25px;
+  color: var(--texte-clair);
+}
+
+
+/* =====================================================
+   FERMETURE
+===================================================== */
+
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  background: var(--beige);
+  color: var(--texte);
+  font-size: 25px;
+  line-height: 1;
+}
+
+.close-button:hover {
+  background: var(--rose-clair);
+}
+
+
+/* =====================================================
+   PHOTO
+===================================================== */
+
+.photo-upload {
+  margin-bottom: 5px;
+}
+
+.photo-preview {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  overflow: hidden;
+  border: 2px dashed var(--bordure);
+  border-radius: 15px;
+  background: var(--beige);
+  color: var(--texte-clair);
+}
+
+.photo-preview span {
+  font-size: 40px;
+}
+
+.photo-preview p {
+  margin: 8px 0 0;
+}
+
+.photo-preview img {
+  width: 100%;
+  height: 260px;
+  object-fit: contain;
+}
+
+
+/* =====================================================
+   ACTIONS MODALE
+===================================================== */
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+
+/* =====================================================
+   DÉTAIL PRODUIT
+===================================================== */
+
+.detail-modal {
+  max-width: 800px;
+}
+
+.detail-product {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.9fr) minmax(220px, 1.1fr);
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.detail-product-image {
+  width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  border-radius: 15px;
+  background: var(--beige);
+}
+
+.detail-product-info h2 {
+  margin-top: 0;
+  font-size: 28px;
+}
+
+.detail-product-info p {
+  line-height: 1.6;
+}
+
+.detail-price {
+  color: var(--rose);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   OUTILS DE GÉNÉRATION
+===================================================== */
+
+.generation-tools {
+  padding-top: 25px;
+  border-top: 1px solid var(--bordure);
+}
+
+.generation-tools h3 {
+  margin: 0 0 8px;
+}
+
+.generation-tools > p {
+  margin: 0 0 20px;
+  color: var(--texte-clair);
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.tool-button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 18px;
+  border: 1px solid var(--bordure);
+  border-radius: 15px;
+  background: var(--beige);
+  color: var(--texte);
+  text-align: left;
+  transition: 0.2s;
+}
+
+.tool-button:hover {
+  transform: translateY(-2px);
+  border-color: var(--rose);
+  background: var(--rose-clair);
+}
+
+.tool-button span {
+  font-size: 27px;
+}
+
+.tool-button strong {
+  font-size: 16px;
+}
+
+.tool-button small {
+  color: var(--texte-clair);
+}
+
+
+/* =====================================================
+   RESPONSIVE TABLETTE / MOBILE
+===================================================== */
+
+@media (max-width: 700px) {
+
+  .auth-card {
+    padding: 25px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .topbar .secondary-button {
+    width: 100%;
+  }
+
+  .dashboard-content {
+    width: 92%;
+    padding-top: 25px;
+  }
+
+  .welcome-box {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 24px;
+  }
+
+  .welcome-box .primary-button {
+    width: 100%;
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(
+      2,
+      minmax(0, 1fr)
+    );
+    gap: 12px;
+  }
+
+  .product-image {
+    height: 160px;
+  }
+
+  .product-card-content {
+    padding: 13px;
+  }
+
+  .product-card-content h3 {
+    font-size: 16px;
+  }
+
+  .modal {
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  .modal-content {
+    margin: 10px 0;
+    padding: 22px;
+  }
+
+  .detail-product {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .tools-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
+}
+
+
+@media (max-width: 420px) {
+
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .product-image {
+    height: 220px;
+  }
+
+}

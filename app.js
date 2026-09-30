@@ -1,68 +1,34 @@
-/* =====================================================
-   DESIGNIA AI
-   APPLICATION JAVASCRIPT
-===================================================== */
+const SUPABASE_URL = "https://ccxxylgyplmrifpdaeig.supabase.co";
+const SUPABASE_KEY = "sb_publishable_wHGieMuIRhyXYq4tDOliIg_D7pxnOMP";
 
-
-/* =====================================================
-   CONFIGURATION SUPABASE
-===================================================== */
-
-const SUPABASE_URL =
-  "https://ccxxylgyplmrifpdaeig.supabase.co";
-
-const SUPABASE_KEY =
-  "sb_publishable_wHGieMuIRhyXYq4tDOliIg_D7pxnOMP";
-
-const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-
-
-/* =====================================================
-   VARIABLES
-===================================================== */
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 
 let currentUser = null;
 let currentProduct = null;
 let categories = [];
+let authMode = "login";
 
 
 /* =====================================================
-   ÉLÉMENTS HTML
+   ÉLÉMENTS
 ===================================================== */
 
-const authScreen =
-  document.getElementById("authScreen");
+const authScreen = document.getElementById("authScreen");
+const dashboard = document.getElementById("dashboard");
 
-const dashboard =
-  document.getElementById("dashboard");
+const authForm = document.getElementById("authForm");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const authButton = document.getElementById("authButton");
+const authMessage = document.getElementById("authMessage");
 
-const authForm =
-  document.getElementById("authForm");
+const loginTab = document.getElementById("loginTab");
+const signupTab = document.getElementById("signupTab");
 
-const emailInput =
-  document.getElementById("email");
-
-const passwordInput =
-  document.getElementById("password");
-
-const authButton =
-  document.getElementById("authButton");
-
-const authMessage =
-  document.getElementById("authMessage");
-
-const loginTab =
-  document.getElementById("loginTab");
-
-const signupTab =
-  document.getElementById("signupTab");
-
-const logoutButton =
-  document.getElementById("logoutButton");
+const logoutButton = document.getElementById("logoutButton");
 
 const newProductButton =
   document.getElementById("newProductButton");
@@ -126,59 +92,44 @@ const generationMessage =
 
 
 /* =====================================================
-   MODE CONNEXION / INSCRIPTION
+   CONNEXION / INSCRIPTION
 ===================================================== */
-
-let authMode = "login";
-
 
 function setAuthMode(mode) {
 
   authMode = mode;
 
-  if (mode === "login") {
+  loginTab.classList.toggle(
+    "active",
+    mode === "login"
+  );
 
-    loginTab.classList.add("active");
-    signupTab.classList.remove("active");
+  signupTab.classList.toggle(
+    "active",
+    mode === "signup"
+  );
 
-    authButton.textContent =
-      "Se connecter";
-
-  } else {
-
-    signupTab.classList.add("active");
-    loginTab.classList.remove("active");
-
-    authButton.textContent =
-      "Créer mon compte";
-
-  }
+  authButton.textContent =
+    mode === "login"
+      ? "Se connecter"
+      : "Créer mon compte";
 
   authMessage.textContent = "";
-
 }
 
 
-/* =====================================================
-   CHANGEMENT D'ONGLET
-===================================================== */
-
 loginTab.addEventListener(
   "click",
-  function() {
-
+  function () {
     setAuthMode("login");
-
   }
 );
 
 
 signupTab.addEventListener(
   "click",
-  function() {
-
+  function () {
     setAuthMode("signup");
-
   }
 );
 
@@ -189,17 +140,12 @@ signupTab.addEventListener(
 
 function escapeHtml(value) {
 
-  if (value === null || value === undefined) {
-    return "";
-  }
-
-  return String(value)
+  return String(value ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
-
 }
 
 
@@ -209,7 +155,7 @@ function escapeHtml(value) {
 
 authForm.addEventListener(
   "submit",
-  async function(event) {
+  async function (event) {
 
     event.preventDefault();
 
@@ -225,7 +171,6 @@ authForm.addEventListener(
         "Merci de remplir tous les champs.";
 
       return;
-
     }
 
     authButton.disabled = true;
@@ -244,21 +189,16 @@ authForm.addEventListener(
           data,
           error
         } =
-          await supabaseClient.auth
-            .signInWithPassword({
-              email,
-              password
-            });
-
+          await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+          });
 
         if (error) {
           throw error;
         }
 
-        currentUser =
-          data.user;
-
-        authMessage.textContent = "";
+        currentUser = data.user;
 
         await showDashboard();
 
@@ -268,24 +208,18 @@ authForm.addEventListener(
           data,
           error
         } =
-          await supabaseClient.auth
-            .signUp({
-              email,
-              password
-            });
-
+          await supabaseClient.auth.signUp({
+            email: email,
+            password: password
+          });
 
         if (error) {
           throw error;
         }
 
-
         if (data.session) {
 
-          currentUser =
-            data.user;
-
-          authMessage.textContent = "";
+          currentUser = data.user;
 
           await showDashboard();
 
@@ -293,9 +227,7 @@ authForm.addEventListener(
 
           authMessage.textContent =
             "Compte créé ! Vérifie ton e-mail si une confirmation est demandée.";
-
         }
-
       }
 
     } catch (error) {
@@ -303,83 +235,58 @@ authForm.addEventListener(
       console.error(error);
 
       authMessage.textContent =
-        getFriendlyAuthError(error);
+        getAuthErrorMessage(error);
 
     } finally {
 
       authButton.disabled = false;
-
     }
-
   }
 );
 
 
 /* =====================================================
-   MESSAGES D'ERREUR AUTHENTIFICATION
+   ERREURS CONNEXION
 ===================================================== */
 
-function getFriendlyAuthError(error) {
+function getAuthErrorMessage(error) {
 
   const message =
     error?.message || "";
 
+  const lower =
+    message.toLowerCase();
+
   if (
-    message.toLowerCase().includes(
-      "invalid login credentials"
-    )
+    lower.includes("invalid login credentials")
   ) {
 
     return "E-mail ou mot de passe incorrect.";
-
   }
 
   if (
-    message.toLowerCase().includes(
-      "user already registered"
-    )
+    lower.includes("user already registered")
   ) {
 
     return "Cette adresse e-mail possède déjà un compte.";
-
   }
 
   if (
-    message.toLowerCase().includes(
-      "password"
-    )
+    lower.includes("password")
   ) {
 
     return "Le mot de passe doit respecter les conditions demandées.";
-
   }
 
-  return message ||
-    "Une erreur est survenue. Réessaie.";
-
+  return (
+    message ||
+    "Une erreur est survenue. Réessaie."
+  );
 }
 
 
 /* =====================================================
-   DÉCONNEXION
-===================================================== */
-
-logoutButton.addEventListener(
-  "click",
-  async function() {
-
-    await supabaseClient.auth.signOut();
-
-    currentUser = null;
-
-    showAuth();
-
-  }
-);
-
-
-/* =====================================================
-   AFFICHER L'ÉCRAN DE CONNEXION
+   AFFICHAGE
 ===================================================== */
 
 function showAuth() {
@@ -387,13 +294,8 @@ function showAuth() {
   authScreen.classList.remove("hidden");
 
   dashboard.classList.add("hidden");
-
 }
 
-
-/* =====================================================
-   AFFICHER LE TABLEAU DE BORD
-===================================================== */
 
 async function showDashboard() {
 
@@ -404,12 +306,11 @@ async function showDashboard() {
   await loadCategories();
 
   await loadProducts();
-
 }
 
 
 /* =====================================================
-   VÉRIFIER LA SESSION
+   SESSION
 ===================================================== */
 
 async function checkSession() {
@@ -418,9 +319,7 @@ async function checkSession() {
     data,
     error
   } =
-    await supabaseClient.auth
-      .getSession();
-
+    await supabaseClient.auth.getSession();
 
   if (error) {
 
@@ -429,9 +328,7 @@ async function checkSession() {
     showAuth();
 
     return;
-
   }
-
 
   if (data.session) {
 
@@ -443,14 +340,29 @@ async function checkSession() {
   } else {
 
     showAuth();
-
   }
-
 }
 
 
 /* =====================================================
-   CHARGER LES CATÉGORIES
+   DÉCONNEXION
+===================================================== */
+
+logoutButton.addEventListener(
+  "click",
+  async function () {
+
+    await supabaseClient.auth.signOut();
+
+    currentUser = null;
+
+    showAuth();
+  }
+);
+
+
+/* =====================================================
+   CATÉGORIES
 ===================================================== */
 
 async function loadCategories() {
@@ -466,7 +378,6 @@ async function loadCategories() {
         ascending: true
       });
 
-
   if (error) {
 
     console.error(
@@ -475,21 +386,16 @@ async function loadCategories() {
     );
 
     return;
-
   }
-
 
   categories =
     data || [];
 
   productCategory.innerHTML =
-    `<option value="">
-      Choisir une catégorie
-    </option>`;
-
+    '<option value="">Choisir une catégorie</option>';
 
   categories.forEach(
-    function(category) {
+    function (category) {
 
       const option =
         document.createElement("option");
@@ -503,51 +409,33 @@ async function loadCategories() {
       productCategory.appendChild(
         option
       );
-
     }
   );
-
 }
 
 
 /* =====================================================
-   OUVRIR MODALE PRODUIT
+   MODALE PRODUIT
 ===================================================== */
 
 function openProductModal() {
 
-  productModal.classList.remove(
-    "hidden"
-  );
+  productModal.classList.remove("hidden");
 
   productForm.reset();
 
   productMessage.textContent = "";
 
-  photoPreview.innerHTML = `
-    <span>📷</span>
-    <p>Sélectionne une photo</p>
-  `;
-
+  photoPreview.innerHTML =
+    "<span>📷</span><p>Sélectionne une photo</p>";
 }
 
-
-/* =====================================================
-   FERMER MODALE PRODUIT
-===================================================== */
 
 function closeProductCreationModal() {
 
-  productModal.classList.add(
-    "hidden"
-  );
-
+  productModal.classList.add("hidden");
 }
 
-
-/* =====================================================
-   BOUTONS NOUVEAU PRODUIT
-===================================================== */
 
 newProductButton.addEventListener(
   "click",
@@ -579,70 +467,78 @@ cancelProductButton.addEventListener(
 
 productPhoto.addEventListener(
   "change",
-  function() {
+  function () {
 
     const file =
       productPhoto.files[0];
 
     if (!file) {
 
-      photoPreview.innerHTML = `
-        <span>📷</span>
-        <p>Sélectionne une photo</p>
-      `;
+      photoPreview.innerHTML =
+        "<span>📷</span><p>Sélectionne une photo</p>";
 
       return;
-
     }
 
-
-    if (file.size > 10 * 1024 * 1024) {
+    if (
+      file.size >
+      10 * 1024 * 1024
+    ) {
 
       productPhoto.value = "";
 
-      photoPreview.innerHTML = `
-        <span>⚠️</span>
-        <p>La photo dépasse 10 Mo.</p>
-      `;
+      photoPreview.innerHTML =
+        "<span>⚠️</span><p>La photo dépasse 10 Mo.</p>";
 
       return;
-
     }
-
 
     const reader =
       new FileReader();
 
-
     reader.onload =
-      function(event) {
+      function (event) {
 
-        photoPreview.innerHTML = `
-          <img
-            src="${event.target.result}"
-            alt="Aperçu"
-          >
-        `;
+        photoPreview.innerHTML =
+          '<img src="' +
+          event.target.result +
+          '" alt="Aperçu">';
 
       };
 
-
     reader.readAsDataURL(file);
-
   }
 );
 
 
 /* =====================================================
-   CRÉATION PRODUIT
+   EXTENSION PHOTO
+===================================================== */
+
+function getFileExtension(filename) {
+
+  const parts =
+    filename.split(".");
+
+  if (parts.length < 2) {
+    return "jpg";
+  }
+
+  return parts[
+    parts.length - 1
+  ].toLowerCase();
+}
+
+
+/* =====================================================
+   CRÉER UN PRODUIT
 ===================================================== */
 
 productForm.addEventListener(
   "submit",
-  async function(event) {
+  async function (event) {
 
     event.preventDefault();
-
 
     if (!currentUser) {
 
@@ -650,9 +546,7 @@ productForm.addEventListener(
         "Ta session a expiré. Reconnecte-toi.";
 
       return;
-
     }
-
 
     const file =
       productPhoto.files[0];
@@ -678,7 +572,6 @@ productForm.addEventListener(
         "Ajoute une photo du produit.";
 
       return;
-
     }
 
 
@@ -688,24 +581,21 @@ productForm.addEventListener(
         "Indique le nom du produit.";
 
       return;
-
     }
 
 
-    saveProductButton.disabled = true;
+    saveProductButton.disabled =
+      true;
 
     saveProductButton.textContent =
       "Création en cours...";
 
-    productMessage.textContent =
-      "Création du produit...";
-
 
     try {
 
-      /* -----------------------------------------
-         1. CRÉER LE PRODUIT
-      ----------------------------------------- */
+      productMessage.textContent =
+        "Création du produit...";
+
 
       const {
         data: product,
@@ -714,17 +604,22 @@ productForm.addEventListener(
         await supabaseClient
           .from("products")
           .insert({
+
             user_id:
               currentUser.id,
 
-            name,
+            name:
+              name,
 
             category_id:
               categoryId,
 
-            price,
+            price:
+              price,
 
-            description
+            description:
+              description
+
           })
           .select()
           .single();
@@ -735,20 +630,19 @@ productForm.addEventListener(
       }
 
 
-      /* -----------------------------------------
-         2. PRÉPARER LE CHEMIN IMAGE
-      ----------------------------------------- */
-
       const extension =
-        getFileExtension(file.name);
+        getFileExtension(
+          file.name
+        );
+
 
       const filePath =
-        `${currentUser.id}/${product.id}.${extension}`;
+        currentUser.id +
+        "/" +
+        product.id +
+        "." +
+        extension;
 
-
-      /* -----------------------------------------
-         3. TÉLÉVERSER L'IMAGE
-      ----------------------------------------- */
 
       productMessage.textContent =
         "Téléversement de la photo...";
@@ -777,16 +671,14 @@ productForm.addEventListener(
         await supabaseClient
           .from("products")
           .delete()
-          .eq("id", product.id);
+          .eq(
+            "id",
+            product.id
+          );
 
         throw uploadError;
-
       }
 
-
-      /* -----------------------------------------
-         4. ENREGISTRER L'IMAGE
-      ----------------------------------------- */
 
       const {
         error: imageError
@@ -794,6 +686,7 @@ productForm.addEventListener(
         await supabaseClient
           .from("product_images")
           .insert({
+
             product_id:
               product.id,
 
@@ -805,6 +698,7 @@ productForm.addEventListener(
 
             image_type:
               "source"
+
           });
 
 
@@ -813,18 +707,16 @@ productForm.addEventListener(
       }
 
 
-      /* -----------------------------------------
-         5. ENREGISTRER LE CHEMIN DANS PRODUCT
-      ----------------------------------------- */
-
       const {
         error: updateError
       } =
         await supabaseClient
           .from("products")
           .update({
+
             photo_url:
               filePath
+
           })
           .eq(
             "id",
@@ -845,7 +737,7 @@ productForm.addEventListener(
 
 
       setTimeout(
-        function() {
+        function () {
 
           closeProductCreationModal();
 
@@ -862,7 +754,9 @@ productForm.addEventListener(
       );
 
       productMessage.textContent =
-        getFriendlyProductError(error);
+        error?.message ||
+        "Impossible de créer le produit.";
+
 
     } finally {
 
@@ -871,66 +765,46 @@ productForm.addEventListener(
 
       saveProductButton.textContent =
         "Créer le produit";
-
     }
-
   }
 );
 
 
 /* =====================================================
-   EXTENSION FICHIER
+   URL SIGNÉE PHOTO PRIVÉE
 ===================================================== */
 
-function getFileExtension(filename) {
+async function getSignedImageUrl(path) {
 
-  const parts =
-    filename.split(".");
-
-  if (parts.length < 2) {
-    return "jpg";
+  if (!path) {
+    return null;
   }
 
-  return parts[
-    parts.length - 1
-  ]
-    .toLowerCase();
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .storage
+      .from("product-images")
+      .createSignedUrl(
+        path,
+        3600
+      );
 
-}
 
+  if (error) {
 
-/* =====================================================
-   ERREURS PRODUIT
-===================================================== */
+    console.error(
+      "Erreur image :",
+      error
+    );
 
-function getFriendlyProductError(error) {
-
-  const message =
-    error?.message || "";
-
-  if (
-    message.toLowerCase().includes(
-      "payload too large"
-    )
-  ) {
-
-    return "La photo est trop volumineuse.";
-
+    return null;
   }
 
-  if (
-    message.toLowerCase().includes(
-      "duplicate"
-    )
-  ) {
 
-    return "Ce fichier existe déjà.";
-
-  }
-
-  return message ||
-    "Impossible de créer le produit.";
-
+  return data?.signedUrl || null;
 }
 
 
@@ -945,12 +819,8 @@ async function loadProducts() {
   }
 
 
-  productsGrid.innerHTML = `
-    <div class="empty-state">
-      <div class="empty-icon">⏳</div>
-      <p>Chargement des produits...</p>
-    </div>
-  `;
+  productsGrid.innerHTML =
+    '<div class="empty-state"><div class="empty-icon">⏳</div><p>Chargement des produits...</p></div>';
 
 
   const {
@@ -978,4 +848,444 @@ async function loadProducts() {
       );
 
 
- 
+  if (error) {
+
+    console.error(
+      "Erreur produits :",
+      error
+    );
+
+    productsGrid.innerHTML =
+      '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Impossible de charger les produits.</p></div>';
+
+    return;
+  }
+
+
+  if (
+    !data ||
+    data.length === 0
+  ) {
+
+    productsGrid.innerHTML = "";
+
+    emptyProducts.classList.remove(
+      "hidden"
+    );
+
+    return;
+  }
+
+
+  emptyProducts.classList.add(
+    "hidden"
+  );
+
+  productsGrid.innerHTML = "";
+
+
+  for (
+    const product of data
+  ) {
+
+    const imageUrl =
+      await getSignedImageUrl(
+        product.photo_url
+      );
+
+
+    const categoryName =
+      product.categories?.name ||
+      "Sans catégorie";
+
+
+    const price =
+      product.price !== null &&
+      product.price !== undefined
+        ? Number(
+            product.price
+          ).toFixed(2) + " €"
+        : "Prix non défini";
+
+
+    const card =
+      document.createElement(
+        "article"
+      );
+
+    card.className =
+      "product-card";
+
+
+    let imageHtml = "";
+
+    if (imageUrl) {
+
+      imageHtml =
+        '<img class="product-image" src="' +
+        imageUrl +
+        '" alt="' +
+        escapeHtml(
+          product.name
+        ) +
+        '">';
+
+    } else {
+
+      imageHtml =
+        '<div class="product-image" style="display:flex;align-items:center;justify-content:center;font-size:45px">📦</div>';
+    }
+
+
+    card.innerHTML =
+      imageHtml +
+
+      '<div class="product-card-content">' +
+
+      '<h3>' +
+      escapeHtml(
+        product.name
+      ) +
+      '</h3>' +
+
+      '<p class="product-category">' +
+      escapeHtml(
+        categoryName
+      ) +
+      '</p>' +
+
+      '<p class="product-price">' +
+      price +
+      '</p>' +
+
+      '<button class="primary-button">' +
+      "Ouvrir" +
+      "</button>" +
+
+      "</div>";
+
+
+    card
+      .querySelector("button")
+      .addEventListener(
+        "click",
+        function () {
+
+          openProductDetail(
+            product
+          );
+
+        }
+      );
+
+
+    productsGrid.appendChild(
+      card
+    );
+  }
+}
+
+
+/* =====================================================
+   DÉTAIL PRODUIT
+===================================================== */
+
+async function openProductDetail(
+  product
+) {
+
+  currentProduct =
+    product;
+
+  detailModal.classList.remove(
+    "hidden"
+  );
+
+  generationMessage.textContent =
+    "";
+
+  detailContent.innerHTML =
+    '<div class="empty-state"><div class="empty-icon">⏳</div><p>Chargement...</p></div>';
+
+
+  const imageUrl =
+    await getSignedImageUrl(
+      product.photo_url
+    );
+
+
+  const categoryName =
+    product.categories?.name ||
+    "Sans catégorie";
+
+
+  const price =
+    product.price !== null &&
+    product.price !== undefined
+      ? Number(
+          product.price
+        ).toFixed(2) + " €"
+      : "Prix non défini";
+
+
+  let imageHtml = "";
+
+  if (imageUrl) {
+
+    imageHtml =
+      '<img class="detail-product-image" src="' +
+      imageUrl +
+      '" alt="' +
+      escapeHtml(
+        product.name
+      ) +
+      '">';
+
+  } else {
+
+    imageHtml =
+      '<div class="detail-product-image" style="min-height:250px;display:flex;align-items:center;justify-content:center;font-size:70px">📦</div>';
+  }
+
+
+  detailContent.innerHTML =
+    '<div class="detail-product">' +
+
+    imageHtml +
+
+    '<div class="detail-product-info">' +
+
+    '<p class="product-category">' +
+    escapeHtml(
+      categoryName
+    ) +
+    '</p>' +
+
+    '<h2>' +
+    escapeHtml(
+      product.name
+    ) +
+    '</h2>' +
+
+    '<p class="detail-price">' +
+    price +
+    '</p>' +
+
+    '<p>' +
+    escapeHtml(
+      product.description ||
+      "Aucune description."
+    ) +
+    '</p>' +
+
+    '</div>' +
+
+    '</div>';
+}
+
+
+/* =====================================================
+   FERMER DÉTAIL
+===================================================== */
+
+closeDetailModal.addEventListener(
+  "click",
+  function () {
+
+    detailModal.classList.add(
+      "hidden"
+    );
+
+    currentProduct = null;
+  }
+);
+
+
+/* =====================================================
+   OUTILS DE GÉNÉRATION
+===================================================== */
+
+document
+  .querySelectorAll(
+    ".tool-button"
+  )
+  .forEach(
+    function (button) {
+
+      button.addEventListener(
+        "click",
+        async function () {
+
+          if (!currentProduct) {
+
+            generationMessage.textContent =
+              "Aucun produit sélectionné.";
+
+            return;
+          }
+
+
+          const type =
+            button.dataset.generation;
+
+
+          const labels = {
+
+            mockup:
+              "Générer un mockup",
+
+            fiche:
+              "Créer une fiche produit",
+
+            promotion:
+              "Créer une fiche promotionnelle",
+
+            presentation:
+              "Créer une présentation"
+
+          };
+
+
+          button.disabled = true;
+
+
+          generationMessage.textContent =
+            "Préparation du visuel...";
+
+
+          try {
+
+            const {
+              error
+            } =
+              await supabaseClient
+                .from(
+                  "design_generations"
+                )
+                .insert({
+
+                  product_id:
+                    currentProduct.id,
+
+                  user_id:
+                    currentUser.id,
+
+                  generation_type:
+                    type,
+
+                  prompt:
+                    labels[type] ||
+                    "Créer un visuel",
+
+                  result_url:
+                    null
+
+                });
+
+
+            if (error) {
+              throw error;
+            }
+
+
+            generationMessage.textContent =
+              (
+                labels[type] ||
+                "Visuel"
+              ) +
+              " enregistré ✨";
+
+
+          } catch (error) {
+
+            console.error(
+              error
+            );
+
+            generationMessage.textContent =
+              "Une erreur est survenue.";
+
+
+          } finally {
+
+            button.disabled =
+              false;
+          }
+        }
+      );
+    }
+  );
+
+
+/* =====================================================
+   FERMETURE EN CLIQUANT À L'EXTÉRIEUR
+===================================================== */
+
+productModal.addEventListener(
+  "click",
+  function (event) {
+
+    if (
+      event.target ===
+      productModal
+    ) {
+
+      closeProductCreationModal();
+    }
+  }
+);
+
+
+detailModal.addEventListener(
+  "click",
+  function (event) {
+
+    if (
+      event.target ===
+      detailModal
+    ) {
+
+      detailModal.classList.add(
+        "hidden"
+      );
+
+      currentProduct = null;
+    }
+  }
+);
+
+
+/* =====================================================
+   SESSION SUPABASE
+===================================================== */
+
+supabaseClient.auth.onAuthStateChange(
+  function (event, session) {
+
+    if (
+      event === "SIGNED_IN" &&
+      session
+    ) {
+
+      currentUser =
+        session.user;
+    }
+
+
+    if (
+      event === "SIGNED_OUT"
+    ) {
+
+      currentUser = null;
+
+      showAuth();
+    }
+  }
+);
+
+
+/* =====================================================
+   DÉMARRAGE
+===================================================== */
+
+checkSession();

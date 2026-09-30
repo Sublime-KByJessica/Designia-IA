@@ -1916,6 +1916,165 @@ async function getProductReferenceImageData() {
   );
 }
 
+/* =====================================================
+   IMAGE DE RÉFÉRENCE DU PRODUIT
+===================================================== */
+
+async function getProductReferenceImageData() {
+
+  if (!currentProduct?.photo_url) {
+
+    throw new Error(
+      "La photo du produit est indisponible."
+    );
+
+  }
+
+
+  const imageUrl =
+    await getSignedImageUrl(
+      currentProduct.photo_url
+    );
+
+
+  if (!imageUrl) {
+
+    throw new Error(
+      "Impossible d'accéder à la photo du produit."
+    );
+
+  }
+
+
+  const image =
+    await new Promise(
+      function (
+        resolve,
+        reject
+      ) {
+
+        const img =
+          new Image();
+
+
+        img.onload =
+          function () {
+
+            resolve(img);
+
+          };
+
+
+        img.onerror =
+          function () {
+
+            reject(
+              new Error(
+                "Impossible de charger la photo du produit."
+              )
+            );
+
+          };
+
+
+        img.src =
+          imageUrl;
+
+      }
+    );
+
+
+  /* =================================================
+     REDIMENSIONNEMENT
+     Cloudflare demande une image de référence
+     inférieure à 512 × 512 pixels.
+  ================================================== */
+
+  const maxSize =
+    512;
+
+
+  const largestSide =
+    Math.max(
+      image.naturalWidth,
+      image.naturalHeight
+    );
+
+
+  const scale =
+    Math.min(
+      1,
+      maxSize / largestSide
+    );
+
+
+  const width =
+    Math.max(
+      1,
+      Math.round(
+        image.naturalWidth * scale
+      )
+    );
+
+
+  const height =
+    Math.max(
+      1,
+      Math.round(
+        image.naturalHeight * scale
+      )
+    );
+
+
+  const canvas =
+    document.createElement(
+      "canvas"
+    );
+
+
+  canvas.width =
+    width;
+
+  canvas.height =
+    height;
+
+
+  const context =
+    canvas.getContext(
+      "2d"
+    );
+
+
+  if (!context) {
+
+    throw new Error(
+      "Impossible de préparer la photo du produit."
+    );
+
+  }
+
+
+  context.drawImage(
+    image,
+    0,
+    0,
+    width,
+    height
+  );
+
+
+  return canvas.toDataURL(
+    "image/jpeg",
+    0.9
+  );
+
+}
+
+
+/* =====================================================
+   GÉNÉRATION DU VISUEL IA
+===================================================== */
+
 prepareAiGeneration.addEventListener(
   "click",
   async function () {
@@ -1954,6 +2113,7 @@ prepareAiGeneration.addEventListener(
     prepareAiGeneration.disabled =
       true;
 
+
     prepareAiGeneration.textContent =
       "✨ Génération en cours...";
 
@@ -1977,7 +2137,9 @@ prepareAiGeneration.addEventListener(
         error: insertError
       } =
         await supabaseClient
-          .from("design_generations")
+          .from(
+            "design_generations"
+          )
           .insert({
 
             product_id:
@@ -2001,7 +2163,9 @@ prepareAiGeneration.addEventListener(
 
 
       if (insertError) {
+
         throw insertError;
+
       }
 
 
@@ -2010,35 +2174,47 @@ prepareAiGeneration.addEventListener(
 
 
       /* =========================
-         2. APPELER L'IA
+         2. PRÉPARER LA PHOTO
       ========================== */
 
       generationMessage.textContent =
-        "L'IA prépare ton visuel...";
+        "📷 Préparation de la photo du produit...";
 
 
-     generationMessage.textContent =
-  "📷 Préparation de la photo du produit...";
+      const imageData =
+        await getProductReferenceImageData();
 
-const imageData =
-  await getProductReferenceImageData();
 
-generationMessage.textContent =
-  "✨ L'IA prépare ton visuel à partir de ton produit...";
+      /* =========================
+         3. APPELER L'IA
+      ========================== */
 
-const {
-  data: aiData,
-  error: aiError
-} =
-  await supabaseClient.functions.invoke(
-    "clever-processor",
-    {
-      body: {
-        prompt,
-        image_data: imageData
-      }
-    }
-  );
+      generationMessage.textContent =
+        "✨ L'IA prépare ton visuel à partir de ton produit...";
+
+
+      const {
+        data: aiData,
+        error: aiError
+      } =
+        await supabaseClient
+          .functions
+          .invoke(
+            "clever-processor",
+            {
+
+              body: {
+
+                prompt:
+                  prompt,
+
+                image_data:
+                  imageData
+
+              }
+
+            }
+          );
 
 
       if (aiError) {
@@ -2048,7 +2224,10 @@ const {
           aiError
         );
 
-        let details = "";
+
+        let details =
+          "";
+
 
         try {
 
@@ -2059,6 +2238,7 @@ const {
             const errorBody =
               await aiError.context.json();
 
+
             details =
               errorBody?.error ||
               "";
@@ -2066,7 +2246,9 @@ const {
           }
 
         } catch (_) {
+
           // Rien à faire si le détail n'est pas lisible
+
         }
 
 
@@ -2075,6 +2257,7 @@ const {
           aiError.message ||
           "Impossible de contacter le moteur IA."
         );
+
       }
 
 
@@ -2088,11 +2271,12 @@ const {
           aiData?.error ||
           "L'IA n'a pas retourné d'image."
         );
+
       }
 
 
       /* =========================
-         3. ENREGISTRER LE VISUEL
+         4. ENREGISTRER LE VISUEL
       ========================== */
 
       generationMessage.textContent =
@@ -2103,7 +2287,9 @@ const {
         error: updateError
       } =
         await supabaseClient
-          .from("design_generations")
+          .from(
+            "design_generations"
+          )
           .update({
 
             result_url:
@@ -2121,12 +2307,14 @@ const {
 
 
       if (updateError) {
+
         throw updateError;
+
       }
 
 
       /* =========================
-         4. AFFICHER LE VISUEL
+         5. AFFICHER LE VISUEL
       ========================== */
 
       aiGenerationPreview.innerHTML =
@@ -2167,7 +2355,9 @@ const {
       if (generationId) {
 
         await supabaseClient
-          .from("design_generations")
+          .from(
+            "design_generations"
+          )
           .delete()
           .eq(
             "id",
@@ -2178,6 +2368,7 @@ const {
             currentUser.id
           );
 
+
         await loadGenerationHistory();
 
       }
@@ -2186,6 +2377,7 @@ const {
 
       prepareAiGeneration.disabled =
         false;
+
 
       prepareAiGeneration.textContent =
         "✨ Préparer le visuel";

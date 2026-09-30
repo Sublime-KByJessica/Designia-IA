@@ -418,7 +418,10 @@ async function loadCategories() {
    MODALE PRODUIT
 ===================================================== */
 
-function openProductModal() {
+let editingProduct = null;
+
+
+function openProductModal(product = null) {
 
   productModal.classList.remove("hidden");
 
@@ -426,8 +429,52 @@ function openProductModal() {
 
   productMessage.textContent = "";
 
-  photoPreview.innerHTML =
-    "<span>📷</span><p>Sélectionne une photo</p>";
+  editingProduct = product;
+
+  productPhoto.required = !product;
+
+  if (product) {
+
+    productModal
+      .querySelector("h2")
+      .textContent = "Modifier le produit";
+
+    saveProductButton.textContent =
+      "Enregistrer les modifications";
+
+    productName.value =
+      product.name || "";
+
+    productCategory.value =
+      product.category_id || "";
+
+    productPrice.value =
+      product.price !== null &&
+      product.price !== undefined
+        ? Number(product.price)
+            .toFixed(2)
+            .replace(".", ",")
+        : "";
+
+    productDescription.value =
+      product.description || "";
+
+    photoPreview.innerHTML =
+      "<span>📷</span>" +
+      "<p>Photo actuelle conservée</p>";
+
+  } else {
+
+    productModal
+      .querySelector("h2")
+      .textContent = "Créer un produit";
+
+    saveProductButton.textContent =
+      "Créer le produit";
+
+    photoPreview.innerHTML =
+      "<span>📷</span><p>Sélectionne une photo</p>";
+  }
 }
 
 
@@ -579,6 +626,75 @@ const price =
   return;
 }
 
+    if (editingProduct) {
+
+  saveProductButton.disabled = true;
+
+  saveProductButton.textContent =
+    "Modification en cours...";
+
+  try {
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from("products")
+        .update({
+          name: name,
+          category_id: categoryId,
+          price: price,
+          description: productDescription.value.trim()
+        })
+        .eq(
+          "id",
+          editingProduct.id
+        )
+        .eq(
+          "user_id",
+          currentUser.id
+        );
+
+    if (error) {
+      throw error;
+    }
+
+    productMessage.textContent =
+      "Produit modifié avec succès ✨";
+
+    editingProduct = null;
+
+    await loadProducts();
+
+    setTimeout(
+      function () {
+        closeProductCreationModal();
+      },
+      700
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Erreur modification produit :",
+      error
+    );
+
+    productMessage.textContent =
+      error?.message ||
+      "Impossible de modifier le produit.";
+
+  } finally {
+
+    saveProductButton.disabled = false;
+
+    saveProductButton.textContent =
+      "Enregistrer les modifications";
+  }
+
+  return;
+}
+    
     const description =
       productDescription.value.trim();
 
@@ -975,25 +1091,47 @@ async function loadProducts() {
       price +
       '</p>' +
 
-      '<button class="primary-button">' +
-      "Ouvrir" +
-      "</button>" +
+      '<div class="product-card-actions">' +
+
+'<button class="primary-button">' +
+"Ouvrir" +
+"</button>" +
+
+'<button class="secondary-button edit-product-button" type="button">' +
+"✏️ Modifier" +
+"</button>" +
+
+"</div>" +
 
       "</div>";
 
 
     card
-      .querySelector("button")
-      .addEventListener(
-        "click",
-        function () {
+  .querySelector(".primary-button")
+  .addEventListener(
+    "click",
+    function () {
 
-          openProductDetail(
-            product
-          );
-
-        }
+      openProductDetail(
+        product
       );
+
+    }
+  );
+
+
+card
+  .querySelector(".edit-product-button")
+  .addEventListener(
+    "click",
+    function () {
+
+      openProductModal(
+        product
+      );
+
+    }
+  );
 
 
     productsGrid.appendChild(

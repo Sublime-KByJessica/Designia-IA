@@ -557,10 +557,6 @@ productForm.addEventListener(
     const categoryId =
       productCategory.value || null;
 
-    const price =
-      productPrice.value
-        ? Number(productPrice.value)
-        : null;
 
     const priceText =
   productPrice.value

@@ -50,6 +50,11 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .hidden {
   display: none !important;
 }
@@ -123,7 +128,7 @@ button {
 
 
 /* =====================================================
-   ONGLETS CONNEXION
+   ONGLETS
 ===================================================== */
 
 .auth-tabs {
@@ -265,7 +270,7 @@ textarea {
 
 
 /* =====================================================
-   CONTENU TABLEAU DE BORD
+   TABLEAU DE BORD
 ===================================================== */
 
 .dashboard-content {
@@ -276,7 +281,7 @@ textarea {
 
 
 /* =====================================================
-   BLOC BIENVENUE
+   BIENVENUE
 ===================================================== */
 
 .welcome-box {
@@ -307,7 +312,7 @@ textarea {
 
 
 /* =====================================================
-   TITRES DE SECTION
+   TITRES
 ===================================================== */
 
 .section-header {
@@ -325,7 +330,7 @@ textarea {
 
 
 /* =====================================================
-   GRILLE PRODUITS
+   PRODUITS
 ===================================================== */
 
 .products-grid {
@@ -336,11 +341,6 @@ textarea {
   );
   gap: 22px;
 }
-
-
-/* =====================================================
-   CARTE PRODUIT
-===================================================== */
 
 .product-card {
   overflow: hidden;
@@ -386,7 +386,13 @@ textarea {
   font-weight: 700;
 }
 
-.product-card .primary-button {
+.product-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.product-card-actions button {
   width: 100%;
 }
 
@@ -446,6 +452,10 @@ textarea {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.20);
 }
 
+.large-modal {
+  max-width: 900px;
+}
+
 .modal-content h2 {
   margin: 0 0 8px;
 }
@@ -460,10 +470,11 @@ textarea {
    FERMETURE
 ===================================================== */
 
-.close-button {
+.modal-close {
   position: absolute;
   top: 15px;
   right: 15px;
+  z-index: 2;
   width: 38px;
   height: 38px;
   border: none;
@@ -474,7 +485,7 @@ textarea {
   line-height: 1;
 }
 
-.close-button:hover {
+.modal-close:hover {
   background: var(--rose-clair);
 }
 
@@ -482,10 +493,6 @@ textarea {
 /* =====================================================
    PHOTO
 ===================================================== */
-
-.photo-upload {
-  margin-bottom: 5px;
-}
 
 .photo-preview {
   min-height: 180px;
@@ -532,13 +539,11 @@ textarea {
    DÉTAIL PRODUIT
 ===================================================== */
 
-.detail-modal {
-  max-width: 800px;
-}
-
 .detail-product {
   display: grid;
-  grid-template-columns: minmax(220px, 0.9fr) minmax(220px, 1.1fr);
+  grid-template-columns:
+    minmax(250px, 0.9fr)
+    minmax(250px, 1.1fr);
   gap: 30px;
   margin-bottom: 30px;
 }
@@ -568,24 +573,46 @@ textarea {
 
 
 /* =====================================================
-   OUTILS DE GÉNÉRATION
+   ÉDITION IA
 ===================================================== */
 
 .generation-tools {
-  padding-top: 25px;
+  padding-top: 28px;
   border-top: 1px solid var(--bordure);
 }
 
-.generation-tools h3 {
-  margin: 0 0 8px;
+.generation-heading {
+  margin-bottom: 20px;
 }
 
-.generation-tools > p {
-  margin: 0 0 20px;
+.generation-heading h3 {
+  margin: 7px 0 5px;
+  font-size: 24px;
+}
+
+.generation-heading p {
+  margin: 0;
   color: var(--texte-clair);
+  line-height: 1.5;
 }
 
-.tools-grid {
+.generation-badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 20px;
+  background: var(--rose-clair);
+  color: var(--rose);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+
+/* =====================================================
+   OUTILS IA
+===================================================== */
+
+.tool-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 14px;
@@ -595,10 +622,11 @@ textarea {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 5px;
-  padding: 18px;
+  gap: 6px;
+  min-height: 145px;
+  padding: 20px;
   border: 1px solid var(--bordure);
-  border-radius: 15px;
+  border-radius: 17px;
   background: var(--beige);
   color: var(--texte);
   text-align: left;
@@ -609,10 +637,11 @@ textarea {
   transform: translateY(-2px);
   border-color: var(--rose);
   background: var(--rose-clair);
+  box-shadow: 0 8px 20px rgba(70, 70, 60, 0.08);
 }
 
-.tool-button span {
-  font-size: 27px;
+.tool-icon {
+  font-size: 30px;
 }
 
 .tool-button strong {
@@ -621,6 +650,216 @@ textarea {
 
 .tool-button small {
   color: var(--texte-clair);
+  line-height: 1.4;
+}
+
+
+/* =====================================================
+   PANNEAU IA
+===================================================== */
+
+.ai-editor-panel {
+  margin-top: 25px;
+  padding: 24px;
+  border: 1px solid var(--bordure);
+  border-radius: 20px;
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #fbfaf6
+    );
+  box-shadow: 0 8px 25px rgba(70, 70, 60, 0.06);
+}
+
+.ai-editor-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.ai-small-label {
+  color: var(--rose);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+}
+
+.ai-editor-header h3 {
+  margin: 5px 0;
+  font-size: 23px;
+}
+
+.ai-editor-header p {
+  margin: 0;
+  color: var(--texte-clair);
+  line-height: 1.5;
+}
+
+.ai-close-button {
+  flex: 0 0 auto;
+  width: 35px;
+  height: 35px;
+  border: none;
+  border-radius: 50%;
+  background: var(--beige);
+  color: var(--texte);
+  font-size: 23px;
+}
+
+.ai-close-button:hover {
+  background: var(--rose-clair);
+}
+
+
+/* =====================================================
+   LAYOUT ÉDITEUR
+===================================================== */
+
+.ai-editor-layout {
+  display: grid;
+  grid-template-columns:
+    minmax(220px, 0.8fr)
+    minmax(300px, 1.2fr);
+  gap: 25px;
+}
+
+.ai-preview-box {
+  padding: 15px;
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  background: var(--beige);
+}
+
+.ai-preview-title {
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ai-generation-preview {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 13px;
+  background: var(--blanc);
+  color: var(--texte-clair);
+}
+
+.ai-generation-preview span {
+  font-size: 45px;
+}
+
+.ai-generation-preview p {
+  margin: 8px 0;
+}
+
+.ai-generation-preview img {
+  width: 100%;
+  height: 300px;
+  object-fit: contain;
+}
+
+
+/* =====================================================
+   OPTIONS IA
+===================================================== */
+
+.ai-options label {
+  margin-top: 0;
+}
+
+.ai-options label:not(:first-child) {
+  margin-top: 18px;
+}
+
+.ai-info-box {
+  margin-top: 15px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--vert-clair);
+  color: var(--texte);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.ai-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+
+/* =====================================================
+   HISTORIQUE
+===================================================== */
+
+.generation-history {
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid var(--bordure);
+}
+
+.history-heading h4 {
+  margin: 0 0 5px;
+  font-size: 17px;
+}
+
+.history-heading p {
+  margin: 0 0 15px;
+  color: var(--texte-clair);
+  font-size: 13px;
+}
+
+.generation-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 12px 14px;
+  border: 1px solid var(--bordure);
+  border-radius: 12px;
+  background: var(--beige);
+}
+
+.history-item strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 14px;
+}
+
+.history-item small {
+  color: var(--texte-clair);
+}
+
+.history-status {
+  flex: 0 0 auto;
+  padding: 5px 9px;
+  border-radius: 15px;
+  background: var(--rose-clair);
+  color: var(--rose);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.history-empty {
+  padding: 18px;
+  border-radius: 12px;
+  background: var(--beige);
+  color: var(--texte-clair);
+  text-align: center;
+  font-size: 13px;
 }
 
 
@@ -693,16 +932,35 @@ textarea {
     gap: 18px;
   }
 
-  .tools-grid {
+  .tool-grid {
     grid-template-columns: 1fr;
   }
 
-  .modal-actions {
+  .ai-editor-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .ai-generation-preview {
+    min-height: 220px;
+  }
+
+  .ai-generation-preview img {
+    height: 220px;
+  }
+
+  .modal-actions,
+  .ai-editor-actions {
     flex-direction: column-reverse;
   }
 
-  .modal-actions button {
+  .modal-actions button,
+  .ai-editor-actions button {
     width: 100%;
+  }
+
+  .history-item {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 
@@ -717,4 +975,7 @@ textarea {
     height: 220px;
   }
 
+  .ai-editor-panel {
+    padding: 17px;
+  }
 }

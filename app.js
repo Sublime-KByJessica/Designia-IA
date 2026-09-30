@@ -1795,7 +1795,7 @@ function buildGenerationPrompt() {
 
 
 /* =====================================================
-   PRÉPARER UNE GÉNÉRATION
+   LANCER UNE GÉNÉRATION IA
 ===================================================== */
 
 prepareAiGeneration.addEventListener(
@@ -1837,22 +1837,29 @@ prepareAiGeneration.addEventListener(
       true;
 
     prepareAiGeneration.textContent =
-      "Préparation...";
+      "✨ Génération en cours...";
 
 
     generationMessage.textContent =
-      "Enregistrement de ta demande IA...";
+      "Création de ton visuel IA...";
+
+
+    let generationId =
+      null;
 
 
     try {
 
+      /* =========================
+         1. ENREGISTRER LA DEMANDE
+      ========================== */
+
       const {
-        error
+        data: generation,
+        error: insertError
       } =
         await supabaseClient
-          .from(
-            "design_generations"
-          )
+          .from("design_generations")
           .insert({
 
             product_id:
@@ -1870,34 +1877,145 @@ prepareAiGeneration.addEventListener(
             result_url:
               null
 
-          });
+          })
+          .select()
+          .single();
 
 
-      if (error) {
-        throw error;
+      if (insertError) {
+        throw insertError;
       }
 
 
+      generationId =
+        generation.id;
+
+
+      /* =========================
+         2. APPELER L'IA
+      ========================== */
+
       generationMessage.textContent =
-        "Demande enregistrée ✨";
+        "L'IA prépare ton visuel...";
+
+
+      const {
+        data: aiData,
+        error: aiError
+      } =
+        await supabaseClient.functions.invoke(
+          "clever-processor",
+          {
+            body: {
+              prompt: prompt
+            }
+          }
+        );
+
+
+      if (aiError) {
+
+        console.error(
+          "Erreur Edge Function :",
+          aiError
+        );
+
+        let details = "";
+
+        try {
+
+          if (
+            aiError.context
+          ) {
+
+            const errorBody =
+              await aiError.context.json();
+
+            details =
+              errorBody?.error ||
+              "";
+
+          }
+
+        } catch (_) {
+          // Rien à faire si le détail n'est pas lisible
+        }
+
+
+        throw new Error(
+          details ||
+          aiError.message ||
+          "Impossible de contacter le moteur IA."
+        );
+      }
+
+
+      if (
+        !aiData ||
+        !aiData.success ||
+        !aiData.image
+      ) {
+
+        throw new Error(
+          aiData?.error ||
+          "L'IA n'a pas retourné d'image."
+        );
+      }
+
+
+      /* =========================
+         3. ENREGISTRER LE VISUEL
+      ========================== */
+
+      generationMessage.textContent =
+        "Visuel généré ✨";
+
+
+      const {
+        error: updateError
+      } =
+        await supabaseClient
+          .from("design_generations")
+          .update({
+
+            result_url:
+              aiData.image
+
+          })
+          .eq(
+            "id",
+            generationId
+          )
+          .eq(
+            "user_id",
+            currentUser.id
+          );
+
+
+      if (updateError) {
+        throw updateError;
+      }
+
+
+      /* =========================
+         4. AFFICHER LE VISUEL
+      ========================== */
+
+      aiGenerationPreview.innerHTML =
+        '<img src="' +
+        aiData.image +
+        '" alt="Visuel généré par IA">';
 
 
       await loadGenerationHistory();
 
 
+      generationMessage.textContent =
+        "Ton visuel est prêt ✨";
+
+
       aiInstructions.value =
         "";
-
-
-      setTimeout(
-        function () {
-
-          generationMessage.textContent =
-            "Ta demande est prête pour le moteur IA.";
-
-        },
-        700
-      );
 
 
     } catch (error) {
@@ -1907,9 +2025,34 @@ prepareAiGeneration.addEventListener(
         error
       );
 
+
       generationMessage.textContent =
         error?.message ||
-        "Impossible d'enregistrer la demande.";
+        "Impossible de générer le visuel.";
+
+
+      /* =========================
+         SUPPRIMER LA DEMANDE
+         SI LA GÉNÉRATION ÉCHOUE
+      ========================== */
+
+      if (generationId) {
+
+        await supabaseClient
+          .from("design_generations")
+          .delete()
+          .eq(
+            "id",
+            generationId
+          )
+          .eq(
+            "user_id",
+            currentUser.id
+          );
+
+        await loadGenerationHistory();
+
+      }
 
     } finally {
 
@@ -1923,7 +2066,6 @@ prepareAiGeneration.addEventListener(
 
   }
 );
-
 
 /* =====================================================
    HISTORIQUE DES GÉNÉRATIONS

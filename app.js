@@ -1744,6 +1744,27 @@ function buildGenerationPrompt() {
 
 
   let prompt =
+    "Utilise impérativement la photo du produit fournie " +
+    "comme image de référence principale. ";
+
+
+  prompt +=
+    "Conserve exactement le produit présenté sur la photo, " +
+    "sa forme, ses proportions, ses couleurs, son motif, " +
+    "son texte, son logo et ses détails. ";
+
+
+  prompt +=
+    "Ne remplace pas le produit par un produit similaire " +
+    "et ne réinvente pas le produit. ";
+
+
+  prompt +=
+    "Modifie uniquement la présentation, la mise en scène, " +
+    "le décor, l'éclairage et l'ambiance selon les consignes. ";
+
+
+  prompt +=
     "Produit : " +
     currentProduct.name +
     ". ";
@@ -1797,6 +1818,103 @@ function buildGenerationPrompt() {
 /* =====================================================
    LANCER UNE GÉNÉRATION IA
 ===================================================== */
+
+async function getProductReferenceImageData() {
+
+  if (!currentProduct?.photo_url) {
+    throw new Error(
+      "La photo du produit est indisponible."
+    );
+  }
+
+  const imageUrl =
+    await getSignedImageUrl(
+      currentProduct.photo_url
+    );
+
+  if (!imageUrl) {
+    throw new Error(
+      "Impossible d'accéder à la photo du produit."
+    );
+  }
+
+  const image =
+    await new Promise(
+      (resolve, reject) => {
+
+        const img =
+          new Image();
+
+        img.onload = () => {
+          resolve(img);
+        };
+
+        img.onerror = () => {
+          reject(
+            new Error(
+              "Impossible de charger la photo du produit."
+            )
+          );
+        };
+
+        img.src = imageUrl;
+      }
+    );
+
+  const maxSize = 512;
+
+  const largestSide =
+    Math.max(
+      image.naturalWidth,
+      image.naturalHeight
+    );
+
+  const scale =
+    Math.min(
+      1,
+      maxSize / largestSide
+    );
+
+  const width =
+    Math.max(
+      1,
+      Math.round(
+        image.naturalWidth * scale
+      )
+    );
+
+  const height =
+    Math.max(
+      1,
+      Math.round(
+        image.naturalHeight * scale
+      )
+    );
+
+  const canvas =
+    document.createElement(
+      "canvas"
+    );
+
+  canvas.width = width;
+  canvas.height = height;
+
+  const context =
+    canvas.getContext("2d");
+
+  context.drawImage(
+    image,
+    0,
+    0,
+    width,
+    height
+  );
+
+  return canvas.toDataURL(
+    "image/jpeg",
+    0.9
+  );
+}
 
 prepareAiGeneration.addEventListener(
   "click",
@@ -1899,18 +2017,28 @@ prepareAiGeneration.addEventListener(
         "L'IA prépare ton visuel...";
 
 
-      const {
-        data: aiData,
-        error: aiError
-      } =
-        await supabaseClient.functions.invoke(
-          "clever-processor",
-          {
-            body: {
-              prompt: prompt
-            }
-          }
-        );
+     generationMessage.textContent =
+  "📷 Préparation de la photo du produit...";
+
+const imageData =
+  await getProductReferenceImageData();
+
+generationMessage.textContent =
+  "✨ L'IA prépare ton visuel à partir de ton produit...";
+
+const {
+  data: aiData,
+  error: aiError
+} =
+  await supabaseClient.functions.invoke(
+    "clever-processor",
+    {
+      body: {
+        prompt,
+        image_data: imageData
+      }
+    }
+  );
 
 
       if (aiError) {

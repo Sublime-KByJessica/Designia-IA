@@ -1,2186 +1,1401 @@
-const SUPABASE_URL = "https://ccxxylgyplmrifpdaeig.supabase.co";
-const SUPABASE_KEY = "sb_publishable_wHGieMuIRhyXYq4tDOliIg_D7pxnOMP";
+/* =========================================================
+   DESIGNIA AI — STYLE COMPLET
+   ========================================================= */
 
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+:root {
+  --rose: #d98fa6;
+  --rose-clair: #f8e5ec;
+  --rose-tres-clair: #fff7fa;
 
-let currentUser = null;
-let currentProduct = null;
-let categories = [];
-let authMode = "login";
-let editingProduct = null;
-let selectedGenerationType = null;
+  --sauge: #9aaa8d;
+  --sauge-clair: #e7eee3;
 
+  --vert-clair: #c8d8bd;
+  --kaki: #aeb89b;
 
-/* =====================================================
-   ÉLÉMENTS
-===================================================== */
+  --beige: #f7f1e8;
+  --beige-fonce: #e9dfd1;
 
-const authScreen =
-  document.getElementById("authScreen");
+  --blanc: #ffffff;
+  --texte: #3f403d;
+  --texte-clair: #74766f;
 
-const dashboard =
-  document.getElementById("dashboard");
+  --bordure: #e4dfd8;
 
-const authForm =
-  document.getElementById("authForm");
+  --danger: #c96c6c;
+  --succes: #769b75;
 
-const emailInput =
-  document.getElementById("email");
+  --ombre: 0 8px 25px rgba(70, 70, 60, 0.08);
+  --ombre-forte: 0 15px 40px rgba(70, 70, 60, 0.14);
 
-const passwordInput =
-  document.getElementById("password");
-
-const authButton =
-  document.getElementById("authButton");
-
-const authMessage =
-  document.getElementById("authMessage");
-
-const loginTab =
-  document.getElementById("loginTab");
-
-const signupTab =
-  document.getElementById("signupTab");
-
-const logoutButton =
-  document.getElementById("logoutButton");
-
-const newProductButton =
-  document.getElementById("newProductButton");
-
-const emptyNewProductButton =
-  document.getElementById(
-    "emptyNewProductButton"
-  );
-
-const productModal =
-  document.getElementById(
-    "productModal"
-  );
-
-const closeProductModal =
-  document.getElementById(
-    "closeProductModal"
-  );
-
-const cancelProductButton =
-  document.getElementById(
-    "cancelProductButton"
-  );
-
-const productForm =
-  document.getElementById(
-    "productForm"
-  );
-
-const productPhoto =
-  document.getElementById(
-    "productPhoto"
-  );
-
-const photoPreview =
-  document.getElementById(
-    "photoPreview"
-  );
-
-const productName =
-  document.getElementById(
-    "productName"
-  );
-
-const productCategory =
-  document.getElementById(
-    "productCategory"
-  );
-
-const productPrice =
-  document.getElementById(
-    "productPrice"
-  );
-
-const productDescription =
-  document.getElementById(
-    "productDescription"
-  );
-
-const productMessage =
-  document.getElementById(
-    "productMessage"
-  );
-
-const saveProductButton =
-  document.getElementById(
-    "saveProductButton"
-  );
-
-const productsGrid =
-  document.getElementById(
-    "productsGrid"
-  );
-
-const emptyProducts =
-  document.getElementById(
-    "emptyProducts"
-  );
-
-const detailModal =
-  document.getElementById(
-    "detailModal"
-  );
-
-const closeDetailModal =
-  document.getElementById(
-    "closeDetailModal"
-  );
-
-const detailContent =
-  document.getElementById(
-    "detailContent"
-  );
-
-const generationMessage =
-  document.getElementById(
-    "generationMessage"
-  );
-
-
-/* =====================================================
-   ÉLÉMENTS ÉDITION IA
-===================================================== */
-
-const aiEditorPanel =
-  document.getElementById(
-    "aiEditorPanel"
-  );
-
-const aiEditorTitle =
-  document.getElementById(
-    "aiEditorTitle"
-  );
-
-const aiEditorSubtitle =
-  document.getElementById(
-    "aiEditorSubtitle"
-  );
-
-const aiStyle =
-  document.getElementById(
-    "aiStyle"
-  );
-
-const aiFormat =
-  document.getElementById(
-    "aiFormat"
-  );
-
-const aiInstructions =
-  document.getElementById(
-    "aiInstructions"
-  );
-
-const prepareAiGeneration =
-  document.getElementById(
-    "prepareAiGeneration"
-  );
-
-const closeAiEditor =
-  document.getElementById(
-    "closeAiEditor"
-  );
-
-const closeAiEditorBottom =
-  document.getElementById(
-    "closeAiEditorBottom"
-  );
-
-const aiGenerationPreview =
-  document.getElementById(
-    "aiGenerationPreview"
-  );
-
-const generationHistory =
-  document.getElementById(
-    "generationHistory"
-  );
-
-
-/* =====================================================
-   CONNEXION / INSCRIPTION
-===================================================== */
-
-function setAuthMode(mode) {
-
-  authMode = mode;
-
-  loginTab.classList.toggle(
-    "active",
-    mode === "login"
-  );
-
-  signupTab.classList.toggle(
-    "active",
-    mode === "signup"
-  );
-
-  authButton.textContent =
-    mode === "login"
-      ? "Se connecter"
-      : "Créer mon compte";
-
-  authMessage.textContent = "";
+  --rayon: 18px;
+  --rayon-petit: 12px;
 }
 
+/* =========================================================
+   RESET
+   ========================================================= */
 
-loginTab.addEventListener(
-  "click",
-  function () {
+* {
+  box-sizing: border-box;
+}
 
-    setAuthMode("login");
+html {
+  scroll-behavior: smooth;
+}
 
-  }
-);
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
 
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
 
-signupTab.addEventListener(
-  "click",
-  function () {
-
-    setAuthMode("signup");
-
-  }
-);
-
-
-/* =====================================================
-   ÉCHAPPEMENT HTML
-===================================================== */
-
-function escapeHtml(value) {
-
-  return String(value ?? "")
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
+  background:
+    linear-gradient(
+      135deg,
+      var(--rose-tres-clair),
+      var(--beige)
     );
+
+  color: var(--texte);
 }
 
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
 
-/* =====================================================
+button {
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* =========================================================
+   UTILITAIRE
+   ========================================================= */
+
+.hidden {
+  display: none !important;
+}
+
+/* =========================================================
    AUTHENTIFICATION
-===================================================== */
+   ========================================================= */
 
-authForm.addEventListener(
-  "submit",
-  async function (event) {
+.auth-screen {
+  min-height: 100vh;
 
-    event.preventDefault();
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    const email =
-      emailInput.value.trim();
-
-    const password =
-      passwordInput.value;
-
-    if (!email || !password) {
-
-      authMessage.textContent =
-        "Merci de remplir tous les champs.";
-
-      return;
-    }
-
-    authButton.disabled = true;
-
-    authMessage.textContent =
-      authMode === "login"
-        ? "Connexion en cours..."
-        : "Création du compte...";
-
-
-    try {
-
-      if (authMode === "login") {
-
-        const {
-          data,
-          error
-        } =
-          await supabaseClient.auth
-            .signInWithPassword({
-              email: email,
-              password: password
-            });
-
-        if (error) {
-          throw error;
-        }
-
-        currentUser =
-          data.user;
-
-        await showDashboard();
-
-      } else {
-
-        const {
-          data,
-          error
-        } =
-          await supabaseClient.auth
-            .signUp({
-              email: email,
-              password: password
-            });
-
-        if (error) {
-          throw error;
-        }
-
-        if (data.session) {
-
-          currentUser =
-            data.user;
-
-          await showDashboard();
-
-        } else {
-
-          authMessage.textContent =
-            "Compte créé ! Vérifie ton e-mail si une confirmation est demandée.";
-
-        }
-      }
-
-    } catch (error) {
-
-      console.error(error);
-
-      authMessage.textContent =
-        getAuthErrorMessage(error);
-
-    } finally {
-
-      authButton.disabled =
-        false;
-
-    }
-  }
-);
-
-
-/* =====================================================
-   ERREURS CONNEXION
-===================================================== */
-
-function getAuthErrorMessage(error) {
-
-  const message =
-    error?.message || "";
-
-  const lower =
-    message.toLowerCase();
-
-  if (
-    lower.includes(
-      "invalid login credentials"
-    )
-  ) {
-
-    return "E-mail ou mot de passe incorrect.";
-  }
-
-  if (
-    lower.includes(
-      "user already registered"
-    )
-  ) {
-
-    return "Cette adresse e-mail possède déjà un compte.";
-  }
-
-  if (
-    lower.includes("password")
-  ) {
-
-    return "Le mot de passe doit respecter les conditions demandées.";
-  }
-
-  return (
-    message ||
-    "Une erreur est survenue. Réessaie."
-  );
+  padding: 25px;
 }
 
+.auth-card {
+  width: 100%;
+  max-width: 460px;
 
-/* =====================================================
-   AFFICHAGE
-===================================================== */
+  background: var(--blanc);
 
-function showAuth() {
+  border-radius: 24px;
 
-  authScreen.classList.remove(
-    "hidden"
-  );
+  padding: 35px;
 
-  dashboard.classList.add(
-    "hidden"
-  );
+  box-shadow: var(--ombre-forte);
+
+  text-align: center;
 }
 
+.auth-card h1 {
+  margin: 0 0 10px;
 
-async function showDashboard() {
+  font-size: 30px;
 
-  authScreen.classList.add(
-    "hidden"
-  );
-
-  dashboard.classList.remove(
-    "hidden"
-  );
-
-  await loadCategories();
-
-  await loadProducts();
+  color: var(--rose);
 }
 
+.auth-card p {
+  margin: 0 0 25px;
 
-/* =====================================================
-   SESSION
-===================================================== */
+  color: var(--texte-clair);
 
-async function checkSession() {
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient.auth
-      .getSession();
-
-  if (error) {
-
-    console.error(error);
-
-    showAuth();
-
-    return;
-  }
-
-  if (data.session) {
-
-    currentUser =
-      data.session.user;
-
-    await showDashboard();
-
-  } else {
-
-    showAuth();
-
-  }
+  line-height: 1.5;
 }
 
+/* =========================================================
+   FORMULAIRES
+   ========================================================= */
 
-/* =====================================================
-   DÉCONNEXION
-===================================================== */
+.form-group {
+  margin-bottom: 18px;
 
-logoutButton.addEventListener(
-  "click",
-  async function () {
+  text-align: left;
+}
 
-    await supabaseClient.auth
-      .signOut();
+.form-group label {
+  display: block;
 
-    currentUser = null;
+  margin-bottom: 7px;
 
-    showAuth();
+  font-weight: 600;
 
-  }
-);
+  color: var(--texte);
+}
 
+input,
+textarea,
+select {
+  width: 100%;
 
-/* =====================================================
-   CATÉGORIES
-===================================================== */
+  border: 1px solid var(--bordure);
 
-async function loadCategories() {
+  border-radius: var(--rayon-petit);
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("categories")
-      .select("*")
-      .order(
-        "name",
-        {
-          ascending: true
-        }
-      );
+  padding: 12px 14px;
 
-  if (error) {
+  background: var(--blanc);
 
-    console.error(
-      "Erreur catégories :",
-      error
+  color: var(--texte);
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--rose);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(217, 143, 166, 0.15);
+}
+
+textarea {
+  min-height: 120px;
+
+  resize: vertical;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   BOUTONS
+   ========================================================= */
+
+button {
+  border: none;
+
+  border-radius: 12px;
+
+  padding: 11px 18px;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    opacity 0.15s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+.primary-button {
+  background: var(--rose);
+
+  color: white;
+
+  box-shadow:
+    0 5px 14px
+    rgba(217, 143, 166, 0.25);
+}
+
+.primary-button:hover {
+  box-shadow:
+    0 8px 18px
+    rgba(217, 143, 166, 0.32);
+}
+
+.secondary-button {
+  background: var(--sauge-clair);
+
+  color: var(--texte);
+}
+
+.secondary-button:hover {
+  background: var(--vert-clair);
+}
+
+.danger-button {
+  background: var(--danger);
+
+  color: white;
+}
+
+.button-row {
+  display: flex;
+
+  gap: 10px;
+
+  flex-wrap: wrap;
+
+  margin-top: 20px;
+}
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+
+.dashboard {
+  min-height: 100vh;
+
+  padding: 25px;
+}
+
+.dashboard-header {
+  max-width: 1250px;
+
+  margin: 0 auto 25px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  flex-wrap: wrap;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+
+  color: var(--rose);
+
+  font-size: 30px;
+}
+
+.dashboard-header p {
+  margin: 5px 0 0;
+
+  color: var(--texte-clair);
+}
+
+/* =========================================================
+   CARTES STATISTIQUES
+   ========================================================= */
+
+.stats-grid {
+  max-width: 1250px;
+
+  margin: 0 auto 25px;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 15px;
+}
+
+.stat-card {
+  background: var(--blanc);
+
+  border: 1px solid var(--bordure);
+
+  border-radius: var(--rayon);
+
+  padding: 20px;
+
+  box-shadow: var(--ombre);
+}
+
+.stat-card h3 {
+  margin: 0 0 8px;
+
+  font-size: 14px;
+
+  color: var(--texte-clair);
+
+  font-weight: 600;
+}
+
+.stat-card strong {
+  display: block;
+
+  font-size: 28px;
+
+  color: var(--rose);
+}
+
+/* =========================================================
+   SECTION PRODUITS
+   ========================================================= */
+
+.products-section {
+  max-width: 1250px;
+
+  margin: 0 auto;
+}
+
+.products-section-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 20px;
+
+  flex-wrap: wrap;
+}
+
+.products-section-header h2 {
+  margin: 0;
+
+  font-size: 23px;
+}
+
+/* =========================================================
+   GRILLE PRODUITS
+   ========================================================= */
+
+.products-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 20px;
+}
+
+.product-card {
+  overflow: hidden;
+
+  background: var(--blanc);
+
+  border: 1px solid var(--bordure);
+
+  border-radius: var(--rayon);
+
+  box-shadow: var(--ombre);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-3px);
+
+  box-shadow: var(--ombre-forte);
+}
+
+.product-card-image {
+  aspect-ratio: 1 / 1;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--rose-clair),
+      var(--sauge-clair)
     );
 
-    return;
-  }
+  display: flex;
 
-  categories =
-    data || [];
+  align-items: center;
 
-  productCategory.innerHTML =
-    '<option value="">Choisir une catégorie</option>';
-
-  categories.forEach(
-    function (category) {
-
-      const option =
-        document.createElement(
-          "option"
-        );
-
-      option.value =
-        category.id;
-
-      option.textContent =
-        category.name;
-
-      productCategory.appendChild(
-        option
-      );
-
-    }
-  );
+  justify-content: center;
 }
 
+.product-card-image img {
+  width: 100%;
+  height: 100%;
 
-/* =====================================================
-   MODALE PRODUIT
-===================================================== */
-
-function openProductModal(
-  product = null
-) {
-
-  productModal.classList.remove(
-    "hidden"
-  );
-
-  productForm.reset();
-
-  productMessage.textContent =
-    "";
-
-  editingProduct =
-    product;
-
-  productPhoto.required =
-    !product;
-
-
-  if (product) {
-
-    productModal
-      .querySelector("h2")
-      .textContent =
-        "Modifier le produit";
-
-    saveProductButton.textContent =
-      "Enregistrer les modifications";
-
-    productName.value =
-      product.name || "";
-
-    productCategory.value =
-      product.category_id || "";
-
-    productPrice.value =
-      product.price !== null &&
-      product.price !== undefined
-        ? Number(
-            product.price
-          )
-            .toFixed(2)
-            .replace(
-              ".",
-              ","
-            )
-        : "";
-
-    productDescription.value =
-      product.description || "";
-
-    photoPreview.innerHTML =
-      "<span>📷</span>" +
-      "<p>Photo actuelle conservée</p>";
-
-  } else {
-
-    productModal
-      .querySelector("h2")
-      .textContent =
-        "Créer un produit";
-
-    saveProductButton.textContent =
-      "Créer le produit";
-
-    photoPreview.innerHTML =
-      "<span>📷</span>" +
-      "<p>Sélectionne une photo</p>";
-
-  }
+  object-fit: cover;
 }
 
-
-function closeProductCreationModal() {
-
-  productModal.classList.add(
-    "hidden"
-  );
-
-  editingProduct =
-    null;
-
-  productPhoto.required =
-    true;
+.product-card-content {
+  padding: 16px;
 }
 
+.product-card-content h3 {
+  margin: 0 0 7px;
 
-newProductButton.addEventListener(
-  "click",
-  function () {
-
-    openProductModal();
-
-  }
-);
-
-
-emptyNewProductButton.addEventListener(
-  "click",
-  function () {
-
-    openProductModal();
-
-  }
-);
-
-
-closeProductModal.addEventListener(
-  "click",
-  closeProductCreationModal
-);
-
-
-cancelProductButton.addEventListener(
-  "click",
-  closeProductCreationModal
-);
-
-
-/* =====================================================
-   APERÇU PHOTO
-===================================================== */
-
-productPhoto.addEventListener(
-  "change",
-  function () {
-
-    const file =
-      productPhoto.files[0];
-
-    if (!file) {
-
-      photoPreview.innerHTML =
-        "<span>📷</span>" +
-        "<p>Sélectionne une photo</p>";
-
-      return;
-    }
-
-    if (
-      file.size >
-      10 * 1024 * 1024
-    ) {
-
-      productPhoto.value =
-        "";
-
-      photoPreview.innerHTML =
-        "<span>⚠️</span>" +
-        "<p>La photo dépasse 10 Mo.</p>";
-
-      return;
-    }
-
-    const reader =
-      new FileReader();
-
-    reader.onload =
-      function (event) {
-
-        photoPreview.innerHTML =
-          '<img src="' +
-          event.target.result +
-          '" alt="Aperçu">';
-
-      };
-
-    reader.readAsDataURL(file);
-
-  }
-);
-
-
-/* =====================================================
-   EXTENSION PHOTO
-===================================================== */
-
-function getFileExtension(
-  filename
-) {
-
-  const parts =
-    filename.split(".");
-
-  if (parts.length < 2) {
-    return "jpg";
-  }
-
-  return parts[
-    parts.length - 1
-  ].toLowerCase();
+  font-size: 17px;
 }
 
+.product-card-category {
+  margin-bottom: 8px;
 
-/* =====================================================
-   CRÉER / MODIFIER UN PRODUIT
-===================================================== */
+  font-size: 13px;
 
-productForm.addEventListener(
-  "submit",
-  async function (event) {
+  color: var(--texte-clair);
+}
 
-    event.preventDefault();
+.product-card-price {
+  margin-bottom: 13px;
 
-    if (!currentUser) {
+  font-size: 18px;
 
-      productMessage.textContent =
-        "Ta session a expiré. Reconnecte-toi.";
+  font-weight: 700;
 
-      return;
-    }
+  color: var(--rose);
+}
 
-    const file =
-      productPhoto.files[0];
+.product-card-actions {
+  display: flex;
 
-    const name =
-      productName.value.trim();
+  gap: 8px;
 
-    const categoryId =
-      productCategory.value ||
-      null;
+  flex-wrap: wrap;
+}
 
-    const priceText =
-      productPrice.value
-        .trim()
-        .replace(
-          ",",
-          "."
-        );
+.product-card-actions button {
+  flex: 1;
 
-    const price =
-      priceText !== ""
-        ? Number(priceText)
-        : null;
+  min-width: 90px;
 
+  font-size: 13px;
+}
 
-    if (
-      price !== null &&
-      (
-        !Number.isFinite(price) ||
-        price < 0
-      )
-    ) {
+/* =========================================================
+   MODALES
+   ========================================================= */
 
-      productMessage.textContent =
-        "Indique un prix valide, par exemple 4,90 €.";
+.modal {
+  position: fixed;
 
-      return;
-    }
+  inset: 0;
 
+  z-index: 1000;
 
-    /* =========================
-       MODIFICATION
-    ========================== */
+  display: flex;
 
-    if (editingProduct) {
+  align-items: center;
 
-      saveProductButton.disabled =
-        true;
+  justify-content: center;
 
-      saveProductButton.textContent =
-        "Modification en cours...";
+  padding: 20px;
 
-      try {
+  background:
+    rgba(55, 55, 50, 0.48);
 
-        const {
-          error
-        } =
-          await supabaseClient
-            .from("products")
-            .update({
+  backdrop-filter: blur(4px);
 
-              name:
-                name,
+  overflow-y: auto;
+}
 
-              category_id:
-                categoryId,
+.modal-content {
+  position: relative;
 
-              price:
-                price,
+  width: 100%;
 
-              description:
-                productDescription
-                  .value
-                  .trim()
+  max-width: 560px;
 
-            })
-            .eq(
-              "id",
-              editingProduct.id
-            )
-            .eq(
-              "user_id",
-              currentUser.id
-            );
+  margin: auto;
 
-        if (error) {
-          throw error;
-        }
+  background: var(--blanc);
 
-        productMessage.textContent =
-          "Produit modifié avec succès ✨";
+  border-radius: 22px;
 
-        editingProduct =
-          null;
+  padding: 28px;
 
-        await loadProducts();
+  box-shadow: var(--ombre-forte);
 
-        setTimeout(
-          function () {
+  max-height: calc(100vh - 40px);
 
-            closeProductCreationModal();
+  overflow-y: auto;
+}
 
-          },
-          700
-        );
+.large-modal {
+  max-width: 1000px;
+}
 
-      } catch (error) {
+.modal-close {
+  position: absolute;
 
-        console.error(
-          "Erreur modification produit :",
-          error
-        );
+  top: 15px;
 
-        productMessage.textContent =
-          error?.message ||
-          "Impossible de modifier le produit.";
+  right: 15px;
 
-      } finally {
+  width: 38px;
 
-        saveProductButton.disabled =
-          false;
+  height: 38px;
 
-        saveProductButton.textContent =
-          "Enregistrer les modifications";
+  padding: 0;
 
-      }
+  border-radius: 50%;
 
-      return;
-    }
+  background: var(--rose-clair);
 
+  color: var(--texte);
 
-    /* =========================
-       CRÉATION
-    ========================== */
+  font-size: 20px;
 
-    const description =
-      productDescription.value.trim();
+  display: flex;
 
+  align-items: center;
 
-    if (!file) {
+  justify-content: center;
+}
 
-      productMessage.textContent =
-        "Ajoute une photo du produit.";
+.modal-close:hover {
+  background: var(--rose);
 
-      return;
-    }
+  color: white;
+}
 
+.modal-content h2 {
+  margin-top: 0;
 
-    if (!name) {
+  padding-right: 45px;
 
-      productMessage.textContent =
-        "Indique le nom du produit.";
+  color: var(--rose);
+}
 
-      return;
-    }
+.modal-content h3 {
+  margin-top: 0;
+}
 
+/* =========================================================
+   PHOTO PRODUIT
+   ========================================================= */
 
-    saveProductButton.disabled =
-      true;
+.photo-preview {
+  width: 100%;
 
-    saveProductButton.textContent =
-      "Création en cours...";
+  min-height: 180px;
 
+  margin-top: 10px;
 
-    try {
+  border: 2px dashed var(--bordure);
 
-      productMessage.textContent =
-        "Création du produit...";
+  border-radius: 16px;
 
+  background: var(--beige);
 
-      const {
-        data: product,
-        error: productError
-      } =
-        await supabaseClient
-          .from("products")
-          .insert({
+  display: flex;
 
-            user_id:
-              currentUser.id,
+  align-items: center;
 
-            name:
-              name,
+  justify-content: center;
 
-            category_id:
-              categoryId,
+  flex-direction: column;
 
-            price:
-              price,
+  gap: 8px;
 
-            description:
-              description
+  color: var(--texte-clair);
 
-          })
-          .select()
-          .single();
+  text-align: center;
 
+  overflow: hidden;
+}
 
-      if (productError) {
-        throw productError;
-      }
+.photo-preview img {
+  width: 100%;
 
+  max-height: 300px;
 
-      const extension =
-        getFileExtension(
-          file.name
-        );
+  object-fit: contain;
+}
 
+/* =========================================================
+   DETAIL PRODUIT
+   ========================================================= */
 
-      const filePath =
-        currentUser.id +
-        "/" +
-        product.id +
-        "." +
-        extension;
+.product-detail-layout {
+  display: grid;
 
+  grid-template-columns:
+    minmax(250px, 0.9fr)
+    minmax(350px, 1.1fr);
 
-      productMessage.textContent =
-        "Téléversement de la photo...";
+  gap: 30px;
 
+  margin-bottom: 25px;
+}
 
-      const {
-        error: uploadError
-      } =
-        await supabaseClient
-          .storage
-          .from("product-images")
-          .upload(
-            filePath,
-            file,
-            {
-              cacheControl:
-                "3600",
+.product-detail-image {
+  border-radius: 18px;
 
-              upsert:
-                true,
+  overflow: hidden;
 
-              contentType:
-                file.type
-            }
-          );
+  background: var(--beige);
 
+  min-height: 300px;
 
-      if (uploadError) {
+  display: flex;
 
-        await supabaseClient
-          .from("products")
-          .delete()
-          .eq(
-            "id",
-            product.id
-          );
+  align-items: center;
 
-        throw uploadError;
-      }
+  justify-content: center;
+}
 
+.product-detail-image img {
+  width: 100%;
 
-      const {
-        error: imageError
-      } =
-        await supabaseClient
-          .from("product_images")
-          .insert({
+  height: 100%;
 
-            product_id:
-              product.id,
+  max-height: 500px;
 
-            user_id:
-              currentUser.id,
+  object-fit: contain;
+}
 
-            image_url:
-              filePath,
+.product-detail-info h2 {
+  margin-bottom: 10px;
+}
 
-            image_type:
-              "source"
+.product-detail-info p {
+  line-height: 1.6;
 
-          });
+  color: var(--texte-clair);
+}
 
+.product-detail-price {
+  margin: 15px 0;
 
-      if (imageError) {
-        throw imageError;
-      }
+  font-size: 26px;
 
+  font-weight: 700;
 
-      const {
-        error: updateError
-      } =
-        await supabaseClient
-          .from("products")
-          .update({
+  color: var(--rose);
+}
 
-            photo_url:
-              filePath
+/* =========================================================
+   OUTILS DE GENERATION
+   ========================================================= */
 
-          })
-          .eq(
-            "id",
-            product.id
-          );
+.generation-tools {
+  margin-top: 30px;
 
+  padding-top: 25px;
 
-      if (updateError) {
-        throw updateError;
-      }
+  border-top: 1px solid var(--bordure);
+}
 
+.generation-heading {
+  margin-bottom: 18px;
+}
 
-      productMessage.textContent =
-        "Produit créé avec succès ✨";
+.generation-heading h3 {
+  margin: 0 0 6px;
 
+  font-size: 21px;
+}
 
-      await loadProducts();
+.generation-heading p {
+  margin: 0;
 
+  color: var(--texte-clair);
 
-      setTimeout(
-        function () {
+  line-height: 1.5;
+}
 
-          closeProductCreationModal();
+.generation-badge {
+  display: inline-flex;
 
-        },
-        700
-      );
+  align-items: center;
 
+  gap: 6px;
 
-    } catch (error) {
+  margin-bottom: 10px;
 
-      console.error(
-        "Erreur création produit :",
-        error
-      );
+  padding: 6px 10px;
 
-      productMessage.textContent =
-        error?.message ||
-        "Impossible de créer le produit.";
+  border-radius: 999px;
 
-    } finally {
+  background: var(--rose-clair);
 
-      saveProductButton.disabled =
-        false;
+  color: var(--rose);
 
-      saveProductButton.textContent =
-        "Créer le produit";
+  font-size: 12px;
 
-    }
-  }
-);
+  font-weight: 700;
+}
 
+/* =========================================================
+   GRILLE OUTILS IA
+   ========================================================= */
 
-/* =====================================================
-   URL SIGNÉE PHOTO PRIVÉE
-===================================================== */
+.tool-grid {
+  display: grid;
 
-async function getSignedImageUrl(
-  path
-) {
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
 
-  if (!path) {
-    return null;
-  }
+  gap: 14px;
+}
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .storage
-      .from("product-images")
-      .createSignedUrl(
-        path,
-        3600
-      );
+.tool-button {
+  width: 100%;
 
+  min-height: 145px;
 
-  if (error) {
+  padding: 18px;
 
-    console.error(
-      "Erreur image :",
-      error
+  border: 1px solid var(--bordure);
+
+  border-radius: 18px;
+
+  background: var(--blanc);
+
+  color: var(--texte);
+
+  text-align: left;
+
+  box-shadow: var(--ombre);
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.tool-button:hover {
+  transform: translateY(-3px);
+
+  border-color: var(--rose);
+
+  box-shadow: var(--ombre-forte);
+
+  background: var(--rose-tres-clair);
+}
+
+.tool-icon {
+  width: 45px;
+
+  height: 45px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background: var(--rose-clair);
+
+  font-size: 23px;
+}
+
+.tool-button strong {
+  font-size: 15px;
+}
+
+.tool-button span:not(.tool-icon) {
+  color: var(--texte-clair);
+
+  font-size: 12px;
+
+  line-height: 1.4;
+}
+
+/* =========================================================
+   EDITEUR IA
+   ========================================================= */
+
+.ai-editor-panel {
+  margin-top: 25px;
+
+  padding: 25px;
+
+  border-radius: 20px;
+
+  border: 1px solid var(--bordure);
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--rose-tres-clair),
+      var(--beige)
     );
 
-    return null;
-  }
-
-
-  return data?.signedUrl ||
-    null;
+  box-shadow: var(--ombre);
 }
 
+.ai-editor-header {
+  display: flex;
 
-/* =====================================================
-   CHARGER LES PRODUITS
-===================================================== */
+  align-items: flex-start;
 
-async function loadProducts() {
+  justify-content: space-between;
 
-  if (!currentUser) {
-    return;
-  }
+  gap: 15px;
 
+  margin-bottom: 22px;
+}
 
-  productsGrid.innerHTML =
-    '<div class="empty-state">' +
-    '<div class="empty-icon">⏳</div>' +
-    '<p>Chargement des produits...</p>' +
-    '</div>';
+.ai-editor-header h3 {
+  margin: 0 0 6px;
 
+  color: var(--rose);
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("products")
-      .select(`
-        *,
-        categories (
-          id,
-          name
-        )
-      `)
-      .eq(
-        "user_id",
-        currentUser.id
-      )
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
+  font-size: 23px;
+}
 
+.ai-editor-header p {
+  margin: 0;
 
-  if (error) {
+  color: var(--texte-clair);
 
-    console.error(
-      "Erreur produits :",
-      error
+  line-height: 1.5;
+}
+
+.ai-small-label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  color: var(--texte);
+}
+
+.ai-close-button {
+  flex: 0 0 auto;
+
+  width: 36px;
+
+  height: 36px;
+
+  padding: 0;
+
+  border-radius: 50%;
+
+  background: var(--blanc);
+
+  border: 1px solid var(--bordure);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 18px;
+}
+
+.ai-close-button:hover {
+  background: var(--rose-clair);
+}
+
+/* =========================================================
+   LAYOUT EDITEUR IA
+   ========================================================= */
+
+.ai-editor-layout {
+  display: grid;
+
+  grid-template-columns:
+    minmax(280px, 0.9fr)
+    minmax(300px, 1.1fr);
+
+  gap: 22px;
+}
+
+.ai-preview-box {
+  min-height: 350px;
+
+  border-radius: 18px;
+
+  border: 1px solid var(--bordure);
+
+  background: var(--blanc);
+
+  padding: 18px;
+
+  box-shadow: var(--ombre);
+
+  display: flex;
+
+  flex-direction: column;
+}
+
+.ai-preview-title {
+  margin-bottom: 12px;
+
+  font-weight: 700;
+
+  color: var(--texte);
+}
+
+.ai-generation-preview {
+  flex: 1;
+
+  min-height: 280px;
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--rose-clair),
+      var(--sauge-clair)
     );
 
-    productsGrid.innerHTML =
-      '<div class="empty-state">' +
-      '<div class="empty-icon">⚠️</div>' +
-      '<p>Impossible de charger les produits.</p>' +
-      '</div>';
+  display: flex;
 
-    return;
-  }
+  align-items: center;
 
+  justify-content: center;
 
-  if (
-    !data ||
-    data.length === 0
-  ) {
+  padding: 20px;
 
-    productsGrid.innerHTML =
-      "";
+  text-align: center;
 
-    emptyProducts.classList.remove(
-      "hidden"
-    );
+  color: var(--texte-clair);
 
-    return;
-  }
-
-
-  emptyProducts.classList.add(
-    "hidden"
-  );
-
-  productsGrid.innerHTML =
-    "";
-
-
-  for (
-    const product of data
-  ) {
-
-    const imageUrl =
-      await getSignedImageUrl(
-        product.photo_url
-      );
-
-
-    const categoryName =
-      product.categories?.name ||
-      "Sans catégorie";
-
-
-    const price =
-      product.price !== null &&
-      product.price !== undefined
-        ? Number(
-            product.price
-          ).toFixed(2) +
-          " €"
-        : "Prix non défini";
-
-
-    const card =
-      document.createElement(
-        "article"
-      );
-
-    card.className =
-      "product-card";
-
-
-    let imageHtml =
-      "";
-
-
-    if (imageUrl) {
-
-      imageHtml =
-        '<img class="product-image" src="' +
-        imageUrl +
-        '" alt="' +
-        escapeHtml(
-          product.name
-        ) +
-        '">';
-
-    } else {
-
-      imageHtml =
-        '<div class="product-image" style="display:flex;align-items:center;justify-content:center;font-size:45px">📦</div>';
-
-    }
-
-
-    card.innerHTML =
-      imageHtml +
-
-      '<div class="product-card-content">' +
-
-      '<h3>' +
-      escapeHtml(
-        product.name
-      ) +
-      '</h3>' +
-
-      '<p class="product-category">' +
-      escapeHtml(
-        categoryName
-      ) +
-      '</p>' +
-
-      '<p class="product-price">' +
-      price +
-      '</p>' +
-
-      '<div class="product-card-actions">' +
-
-      '<button class="primary-button">' +
-      "Ouvrir" +
-      "</button>" +
-
-      '<button class="secondary-button edit-product-button" type="button">' +
-      "✏️ Modifier" +
-      "</button>" +
-
-      "</div>" +
-
-      "</div>";
-
-
-    card
-      .querySelector(
-        ".primary-button"
-      )
-      .addEventListener(
-        "click",
-        function () {
-
-          openProductDetail(
-            product
-          );
-
-        }
-      );
-
-
-    card
-      .querySelector(
-        ".edit-product-button"
-      )
-      .addEventListener(
-        "click",
-        function () {
-
-          openProductModal(
-            product
-          );
-
-        }
-      );
-
-
-    productsGrid.appendChild(
-      card
-    );
-
-  }
+  line-height: 1.5;
 }
 
+.ai-options {
+  display: flex;
 
-/* =====================================================
-   DÉTAIL PRODUIT
-===================================================== */
+  flex-direction: column;
 
-async function openProductDetail(
-  product
-) {
+  gap: 15px;
+}
 
-  currentProduct =
-    product;
+/* =========================================================
+   BOITE INFORMATION IA
+   ========================================================= */
 
-  detailModal.classList.remove(
-    "hidden"
-  );
+.ai-info-box {
+  padding: 14px 16px;
 
-  generationMessage.textContent =
-    "";
+  border-radius: 14px;
 
-  aiEditorPanel.classList.add(
-    "hidden"
-  );
+  background: var(--sauge-clair);
 
-  detailContent.innerHTML =
-    '<div class="empty-state">' +
-    '<div class="empty-icon">⏳</div>' +
-    '<p>Chargement...</p>' +
-    '</div>';
+  color: var(--texte);
 
+  font-size: 13px;
 
-  const imageUrl =
-    await getSignedImageUrl(
-      product.photo_url
-    );
+  line-height: 1.5;
+}
 
+.ai-info-box strong {
+  color: var(--sauge);
+}
 
-  const categoryName =
-    product.categories?.name ||
-    "Sans catégorie";
+/* =========================================================
+   ACTIONS EDITEUR
+   ========================================================= */
 
+.ai-editor-actions {
+  display: flex;
 
-  const price =
-    product.price !== null &&
-    product.price !== undefined
-      ? Number(
-          product.price
-        ).toFixed(2) +
-        " €"
-      : "Prix non défini";
+  justify-content: flex-end;
 
+  gap: 10px;
 
-  let imageHtml =
-    "";
+  flex-wrap: wrap;
 
+  margin-top: 20px;
 
-  if (imageUrl) {
+  padding-top: 18px;
 
-    imageHtml =
-      '<img class="detail-product-image" src="' +
-      imageUrl +
-      '" alt="' +
-      escapeHtml(
-        product.name
-      ) +
-      '">';
+  border-top: 1px solid var(--bordure);
+}
 
-  } else {
+/* =========================================================
+   HISTORIQUE DES GENERATIONS
+   ========================================================= */
 
-    imageHtml =
-      '<div class="detail-product-image" style="min-height:250px;display:flex;align-items:center;justify-content:center;font-size:70px">📦</div>';
+.generation-history {
+  margin-top: 25px;
 
+  padding-top: 22px;
+
+  border-top: 1px solid var(--bordure);
+}
+
+.history-heading {
+  margin-bottom: 15px;
+}
+
+.history-heading h3 {
+  margin: 0 0 5px;
+
+  font-size: 19px;
+}
+
+.history-heading p {
+  margin: 0;
+
+  color: var(--texte-clair);
+
+  font-size: 13px;
+}
+
+.generation-history-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.history-empty {
+  padding: 18px;
+
+  border-radius: 14px;
+
+  background: var(--beige);
+
+  color: var(--texte-clair);
+
+  text-align: center;
+
+  font-size: 13px;
+}
+
+.history-item {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  padding: 14px 16px;
+
+  border: 1px solid var(--bordure);
+
+  border-radius: 14px;
+
+  background: var(--blanc);
+}
+
+.history-item strong {
+  display: block;
+
+  margin-bottom: 4px;
+}
+
+.history-item small {
+  color: var(--texte-clair);
+}
+
+.history-status {
+  flex: 0 0 auto;
+
+  padding: 6px 10px;
+
+  border-radius: 999px;
+
+  background: var(--sauge-clair);
+
+  color: var(--succes);
+
+  font-size: 12px;
+
+  font-weight: 700;
+}
+
+/* =========================================================
+   MESSAGES
+   ========================================================= */
+
+.message {
+  margin-top: 12px;
+
+  padding: 10px 13px;
+
+  border-radius: 10px;
+
+  font-size: 13px;
+
+  line-height: 1.4;
+}
+
+.message.success {
+  background: var(--sauge-clair);
+
+  color: var(--succes);
+}
+
+.message.error {
+  background: #f8e1e1;
+
+  color: var(--danger);
+}
+
+/* =========================================================
+   ETATS VIDES
+   ========================================================= */
+
+.empty-state {
+  padding: 45px 20px;
+
+  border: 2px dashed var(--bordure);
+
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.65);
+
+  text-align: center;
+
+  color: var(--texte-clair);
+}
+
+.empty-state strong {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: var(--texte);
+
+  font-size: 18px;
+}
+
+/* =========================================================
+   UPLOAD
+   ========================================================= */
+
+.file-input {
+  width: 100%;
+
+  padding: 10px;
+
+  border: 1px dashed var(--bordure);
+
+  border-radius: 12px;
+
+  background: var(--beige);
+}
+
+/* =========================================================
+   RESPONSIVE TABLETTE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+  .stats-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
 
+  .products-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
 
-  detailContent.innerHTML =
-    '<div class="detail-product">' +
+  .tool-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
 
-    imageHtml +
+  .product-detail-layout {
+    grid-template-columns: 1fr;
+  }
 
-    '<div class="detail-product-info">' +
-
-    '<p class="product-category">' +
-    escapeHtml(
-      categoryName
-    ) +
-    '</p>' +
-
-    '<h2>' +
-    escapeHtml(
-      product.name
-    ) +
-    '</h2>' +
-
-    '<p class="detail-price">' +
-    price +
-    '</p>' +
-
-    '<p>' +
-    escapeHtml(
-      product.description ||
-      "Aucune description."
-    ) +
-    '</p>' +
-
-    '</div>' +
-
-    '</div>';
-
-
-  await prepareAiPreview(
-    imageUrl
-  );
-
-  await loadGenerationHistory();
+  .ai-editor-layout {
+    grid-template-columns: 1fr;
+  }
 
 }
 
+/* =========================================================
+   RESPONSIVE PETITE TABLETTE / TELEPHONE
+   ========================================================= */
 
-/* =====================================================
-   APERÇU IA DU PRODUIT
-===================================================== */
+@media (max-width: 700px) {
 
-async function prepareAiPreview(
-  imageUrl
-) {
-
-  if (!aiGenerationPreview) {
-    return;
+  .dashboard {
+    padding: 15px;
   }
 
-  if (!imageUrl) {
-
-    aiGenerationPreview.innerHTML =
-      "<span>📦</span>" +
-      "<p>Photo indisponible</p>";
-
-    return;
+  .dashboard-header {
+    align-items: flex-start;
   }
 
-  aiGenerationPreview.innerHTML =
-    '<img src="' +
-    imageUrl +
-    '" alt="Produit source">';
+  .dashboard-header h1 {
+    font-size: 25px;
+  }
+
+  .stats-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 15px;
+  }
+
+  .stat-card strong {
+    font-size: 23px;
+  }
+
+  .products-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+  }
+
+  .product-card-content {
+    padding: 12px;
+  }
+
+  .product-card-content h3 {
+    font-size: 15px;
+  }
+
+  .product-card-actions {
+    flex-direction: column;
+  }
+
+  .product-card-actions button {
+    width: 100%;
+  }
+
+  .tool-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tool-button {
+    min-height: 105px;
+  }
+
+  .modal {
+    padding: 10px;
+  }
+
+  .modal-content {
+    padding: 20px;
+
+    max-height: calc(100vh - 20px);
+
+    border-radius: 18px;
+  }
+
+  .large-modal {
+    max-width: 100%;
+  }
+
+  .ai-editor-panel {
+    padding: 18px;
+  }
+
+  .ai-editor-header {
+    padding-right: 35px;
+  }
+
+  .ai-editor-actions {
+    flex-direction: column;
+  }
+
+  .ai-editor-actions button {
+    width: 100%;
+  }
 
 }
 
+/* =========================================================
+   TELEPHONE
+   ========================================================= */
 
-/* =====================================================
-   OUVRIR ÉDITEUR IA
-===================================================== */
+@media (max-width: 480px) {
 
-const generationLabels = {
-
-  mockup: {
-
-    title:
-      "🖼️ Version Mockup",
-
-    subtitle:
-      "Présente ton produit comme dans un catalogue professionnel."
-
-  },
-
-  promotion: {
-
-    title:
-      "📣 Fiche promotionnelle",
-
-    subtitle:
-      "Prépare un visuel publicitaire clair et attractif."
-
-  },
-
-  vente: {
-
-    title:
-      "🛍️ Image de vente",
-
-    subtitle:
-      "Crée le visuel principal destiné à donner envie d’acheter."
-
-  },
-
-  decor: {
-
-    title:
-      "🏡 Exemple dans un décor",
-
-    subtitle:
-      "Montre le produit personnalisé dans une scène réaliste."
-
+  .auth-card {
+    padding: 25px 18px;
   }
 
-};
-
-
-function openAiEditor(
-  type
-) {
-
-  if (!currentProduct) {
-
-    generationMessage.textContent =
-      "Aucun produit sélectionné.";
-
-    return;
+  .auth-card h1 {
+    font-size: 25px;
   }
 
-
-  const label =
-    generationLabels[type];
-
-
-  if (!label) {
-    return;
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
 
-  selectedGenerationType =
-    type;
+  .products-section-header {
+    align-items: stretch;
+  }
 
+  .products-section-header button {
+    width: 100%;
+  }
 
-  aiEditorTitle.textContent =
-    label.title;
+  .history-item {
+    align-items: flex-start;
 
-  aiEditorSubtitle.textContent =
-    label.subtitle;
+    flex-direction: column;
+  }
 
+  .history-status {
+    align-self: flex-start;
+  }
 
-  aiInstructions.value =
-    "";
+  .button-row {
+    flex-direction: column;
+  }
 
-
-  aiStyle.value =
-    "professionnel";
-
-
-  aiFormat.value =
-    "carre";
-
-
-  aiEditorPanel.classList.remove(
-    "hidden"
-  );
-
-
-  aiEditorPanel.scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-  });
+  .button-row button {
+    width: 100%;
+  }
 
 }
 
+/* =========================================================
+   ACCESSIBILITE
+   ========================================================= */
 
-/* =====================================================
-   BOUTONS DES 4 OUTILS
-===================================================== */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgba(217, 143, 166, 0.35);
 
-document
-  .querySelectorAll(
-    ".tool-button"
-  )
-  .forEach(
-    function (button) {
-
-      button.addEventListener(
-        "click",
-        function () {
-
-          openAiEditor(
-            button.dataset.generation
-          );
-
-        }
-      );
-
-    }
-  );
-
-
-/* =====================================================
-   FERMER ÉDITEUR IA
-===================================================== */
-
-function closeAiEditorPanel() {
-
-  aiEditorPanel.classList.add(
-    "hidden"
-  );
-
-  selectedGenerationType =
-    null;
-
-  generationMessage.textContent =
-    "";
+  outline-offset: 2px;
 }
 
-
-closeAiEditor.addEventListener(
-  "click",
-  closeAiEditorPanel
-);
-
-
-closeAiEditorBottom.addEventListener(
-  "click",
-  closeAiEditorPanel
-);
-
-
-/* =====================================================
-   CONSTRUCTION DU PROMPT
-===================================================== */
-
-function buildGenerationPrompt() {
-
-  if (!currentProduct) {
-    return "";
-  }
-
-
-  const type =
-    generationLabels[
-      selectedGenerationType
-    ];
-
-
-  const styleText =
-    aiStyle.options[
-      aiStyle.selectedIndex
-    ]?.text ||
-    "";
-
-
-  const formatText =
-    aiFormat.options[
-      aiFormat.selectedIndex
-    ]?.text ||
-    "";
-
-
-  const customInstructions =
-    aiInstructions.value.trim();
-
-
-  let prompt =
-    "Produit : " +
-    currentProduct.name +
-    ". ";
-
-
-  prompt +=
-    "Type de visuel : " +
-    (type?.title || "") +
-    ". ";
-
-
-  prompt +=
-    "Style : " +
-    styleText +
-    ". ";
-
-
-  prompt +=
-    "Format : " +
-    formatText +
-    ". ";
-
-
-  if (
-    currentProduct.description
-  ) {
-
-    prompt +=
-      "Description du produit : " +
-      currentProduct.description +
-      ". ";
-
-  }
-
-
-  if (
-    customInstructions
-  ) {
-
-    prompt +=
-      "Consignes supplémentaires : " +
-      customInstructions;
-
-  }
-
-
-  return prompt;
-}
-
-
-/* =====================================================
-   PRÉPARER UNE GÉNÉRATION
-===================================================== */
-
-prepareAiGeneration.addEventListener(
-  "click",
-  async function () {
-
-    if (!currentProduct) {
-
-      generationMessage.textContent =
-        "Aucun produit sélectionné.";
-
-      return;
-    }
-
-
-    if (!currentUser) {
-
-      generationMessage.textContent =
-        "Ta session a expiré. Reconnecte-toi.";
-
-      return;
-    }
-
-
-    if (!selectedGenerationType) {
-
-      generationMessage.textContent =
-        "Choisis d'abord un type de visuel.";
-
-      return;
-    }
-
-
-    const prompt =
-      buildGenerationPrompt();
-
-
-    prepareAiGeneration.disabled =
-      true;
-
-    prepareAiGeneration.textContent =
-      "Préparation...";
-
-
-    generationMessage.textContent =
-      "Enregistrement de ta demande IA...";
-
-
-    try {
-
-      const {
-        error
-      } =
-        await supabaseClient
-          .from(
-            "design_generations"
-          )
-          .insert({
-
-            product_id:
-              currentProduct.id,
-
-            user_id:
-              currentUser.id,
-
-            generation_type:
-              selectedGenerationType,
-
-            prompt:
-              prompt,
-
-            result_url:
-              null
-
-          });
-
-
-      if (error) {
-        throw error;
-      }
-
-
-      generationMessage.textContent =
-        "Demande enregistrée ✨";
-
-
-      await loadGenerationHistory();
-
-
-      aiInstructions.value =
-        "";
-
-
-      setTimeout(
-        function () {
-
-          generationMessage.textContent =
-            "Ta demande est prête pour le moteur IA.";
-
-        },
-        700
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        "Erreur génération IA :",
-        error
-      );
-
-      generationMessage.textContent =
-        error?.message ||
-        "Impossible d'enregistrer la demande.";
-
-    } finally {
-
-      prepareAiGeneration.disabled =
-        false;
-
-      prepareAiGeneration.textContent =
-        "✨ Préparer le visuel";
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   HISTORIQUE DES GÉNÉRATIONS
-===================================================== */
-
-async function loadGenerationHistory() {
-
-  if (
-    !currentProduct ||
-    !currentUser
-  ) {
-
-    return;
-  }
-
-
-  generationHistory.innerHTML =
-    '<div class="history-empty">' +
-    'Chargement de l’historique...' +
-    '</div>';
-
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from(
-        "design_generations"
-      )
-      .select("*")
-      .eq(
-        "product_id",
-        currentProduct.id
-      )
-      .eq(
-        "user_id",
-        currentUser.id
-      )
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Erreur historique :",
-      error
-    );
-
-    generationHistory.innerHTML =
-      '<div class="history-empty">' +
-      'Impossible de charger l’historique.' +
-      '</div>';
-
-    return;
-  }
-
-
-  if (
-    !data ||
-    data.length === 0
-  ) {
-
-    generationHistory.innerHTML =
-      '<div class="history-empty">' +
-      'Aucune demande pour le moment.' +
-      '</div>';
-
-    return;
-  }
-
-
-  generationHistory.innerHTML =
-    "";
-
-
-  data.forEach(
-    function (generation) {
-
-      const type =
-        generationLabels[
-          generation.generation_type
-        ];
-
-
-      const title =
-        type?.title ||
-        generation.generation_type ||
-        "Visuel";
-
-
-      const date =
-        generation.created_at
-          ? new Date(
-              generation.created_at
-            ).toLocaleString(
-              "fr-FR"
-            )
-          : "";
-
-
-      const item =
-        document.createElement(
-          "div"
-        );
-
-      item.className =
-        "history-item";
-
-
-      item.innerHTML =
-
-        '<div>' +
-
-        '<strong>' +
-        escapeHtml(
-          title
-        ) +
-        '</strong>' +
-
-        '<small>' +
-        escapeHtml(
-          date
-        ) +
-        '</small>' +
-
-        '</div>' +
-
-        '<span class="history-status">' +
-        (
-          generation.result_url
-            ? "Disponible"
-            : "En attente"
-        ) +
-        '</span>';
-
-
-      generationHistory.appendChild(
-        item
-      );
-
-    }
-  );
-
-}
-
-
-/* =====================================================
-   FERMER DÉTAIL
-===================================================== */
-
-function closeDetailProductModal() {
-
-  detailModal.classList.add(
-    "hidden"
-  );
-
-  currentProduct =
-    null;
-
-  selectedGenerationType =
-    null;
-
-  aiEditorPanel.classList.add(
-    "hidden"
-  );
-
-}
-
-
-closeDetailModal.addEventListener(
-  "click",
-  closeDetailProductModal
-);
-
-
-/* =====================================================
-   FERMETURE EN CLIQUANT À L'EXTÉRIEUR
-===================================================== */
-
-productModal.addEventListener(
-  "click",
-  function (event) {
-
-    if (
-      event.target ===
-      productModal
-    ) {
-
-      closeProductCreationModal();
-
-    }
-
-  }
-);
-
-
-detailModal.addEventListener(
-  "click",
-  function (event) {
-
-    if (
-      event.target ===
-      detailModal
-    ) {
-
-      closeDetailProductModal();
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   SESSION SUPABASE
-===================================================== */
-
-supabaseClient.auth.onAuthStateChange(
-  function (
-    event,
-    session
-  ) {
-
-    if (
-      event === "SIGNED_IN" &&
-      session
-    ) {
-
-      currentUser =
-        session.user;
-
-    }
-
-
-    if (
-      event === "SIGNED_OUT"
-    ) {
-
-      currentUser =
-        null;
-
-      showAuth();
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   DÉMARRAGE
-===================================================== */
-
-checkSession();
+/* =========================================================
+   FIN DESIGNIA AI
+   ========================================================= */

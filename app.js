@@ -561,6 +561,16 @@ productForm.addEventListener(
       productPrice.value
         ? Number(productPrice.value)
         : null;
+    if (
+  price !== null &&
+  (!Number.isFinite(price) || price < 0)
+) {
+
+  productMessage.textContent =
+    "Indique un prix valide, par exemple 4,90 €.";
+
+  return;
+}
 
     const description =
       productDescription.value.trim();

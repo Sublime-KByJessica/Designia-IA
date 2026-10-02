@@ -1881,6 +1881,61 @@ if (personalizationFont) {
 }
 
 /* =====================================================
+   PALETTE DE COULEURS
+===================================================== */
+
+document
+  .querySelectorAll(".color-swatch")
+  .forEach(function (swatch) {
+
+    swatch.addEventListener(
+      "click",
+      function () {
+
+        document
+          .querySelectorAll(".color-swatch")
+          .forEach(function (item) {
+
+            item.classList.remove(
+              "selected"
+            );
+
+          });
+
+        swatch.classList.add(
+          "selected"
+        );
+
+        if (swatch.dataset.gradient) {
+
+          const colors =
+            swatch.dataset.gradient.split(",");
+
+          personalizationColor.value =
+            colors[0];
+
+          personalizationColor.dataset.gradient =
+            swatch.dataset.gradient;
+
+        } else {
+
+          personalizationColor.value =
+            swatch.dataset.color;
+
+          personalizationColor.dataset.gradient =
+            "";
+
+        }
+
+        updatePersonalizationPreview();
+
+      }
+    );
+
+  });
+
+
+/* =====================================================
    FERMER ÉDITEUR IA
 ===================================================== */
 

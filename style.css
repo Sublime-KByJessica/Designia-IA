@@ -1668,7 +1668,7 @@ select:focus-visible {
 
 @font-face {
   font-family: "Qwigley";
-  src: url("./fonts/Qwigley-Regular.ttf") format("truetype");
+  src: url("./fonts/qwigley-latin-400-normal.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;

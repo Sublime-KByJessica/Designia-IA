@@ -1740,11 +1740,14 @@ function updatePersonalizationPreview() {
   const text =
     personalizationText?.value.trim() || "";
 
-  const color =
-    personalizationColor?.value || "#d98fa6";
+ const color =
+  personalizationColor?.value || "#E6C2BF";
 
-  const font =
-    personalizationFont?.value || "Arial";
+const gradient =
+  personalizationColor?.dataset.gradient || "";
+
+const font =
+  personalizationFont?.value || "Arial";
 
 
   personalizationPreview.innerHTML =
@@ -1759,11 +1762,17 @@ function updatePersonalizationPreview() {
 
     '<span ' +
     'class="personalization-text-overlay" ' +
-    'style="color:' +
-    color +
-    ';font-family:' +
-    font +
-    ';">' +
+    'style="' +
+(
+  gradient
+    ? 'color:transparent;background-image:linear-gradient(135deg,' +
+      gradient +
+      ');background-clip:text;-webkit-background-clip:text;'
+    : 'color:' + color + ';'
+) +
+'font-family:' +
+font +
+';">' +
     escapeHtml(text) +
     '</span>' +
 

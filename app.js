@@ -1003,31 +1003,54 @@ productForm.addEventListener(
 
 
       const {
-        data: product,
-        error: productError
-      } =
-        await supabaseClient
-          .from("products")
-          .insert({
+  data: {
+    user
+  },
+  error: sessionError
+} =
+  await supabaseClient.auth.getUser();
 
-            user_id:
-              currentUser.id,
+if (
+  sessionError ||
+  !user
+) {
 
-            name:
-              name,
+  throw new Error(
+    "Ta session a expiré. Reconnecte-toi avant de créer un produit."
+  );
 
-            category_id:
-              categoryId,
+}
 
-            price:
-              price,
+currentUser =
+  user;
 
-            description:
-              description
 
-          })
-          .select()
-          .single();
+const {
+  data: product,
+  error: productError
+} =
+  await supabaseClient
+    .from("products")
+    .insert({
+
+      user_id:
+        user.id,
+
+      name:
+        name,
+
+      category_id:
+        categoryId,
+
+      price:
+        price,
+
+      description:
+        description
+
+    })
+    .select()
+    .single();
 
 
       if (productError) {

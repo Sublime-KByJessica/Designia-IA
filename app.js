@@ -211,20 +211,6 @@ const generationHistory =
     "generationHistory"
   );
 
-const aiGenerationPreview =
-  document.getElementById(
-    "aiGenerationPreview"
-  );
-
-const referenceImageSelector =
-  document.getElementById(
-    "referenceImageSelector"
-  );
-
-const generationHistory =
-  document.getElementById(
-    "generationHistory"
-  );
 
 /* =====================================================
    ÉLÉMENTS APERÇU PERSONNALISATION

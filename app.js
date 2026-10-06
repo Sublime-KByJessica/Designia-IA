@@ -147,14 +147,13 @@ const generationMessage =
     "generationMessage"
   );
 
-
 /* =====================================================
    ÉLÉMENTS ÉDITION IA
 ===================================================== */
 
 const aiEditorPanel =
-  document.getElementById(
-    "aiEditorPanel"
+  document.querySelector(
+    ".ai-editor-layout"
   );
 
 const aiEditorTitle =
@@ -195,6 +194,21 @@ const closeAiEditor =
 const closeAiEditorBottom =
   document.getElementById(
     "closeAiEditorBottom"
+  );
+
+const aiGenerationPreview =
+  document.getElementById(
+    "aiGenerationPreview"
+  );
+
+const referenceImageSelector =
+  document.getElementById(
+    "referenceImageSelector"
+  );
+
+const generationHistory =
+  document.getElementById(
+    "generationHistory"
   );
 
 const aiGenerationPreview =
@@ -2179,11 +2193,19 @@ function openAiEditor(
     type;
 
 
+  if (aiEditorTitle) {
+
   aiEditorTitle.textContent =
     label.title;
 
+}
+
+if (aiEditorSubtitle) {
+
   aiEditorSubtitle.textContent =
     label.subtitle;
+
+}
 
 
   aiInstructions.value =
@@ -2462,9 +2484,13 @@ document
 
 function closeAiEditorPanel() {
 
-  aiEditorPanel.classList.add(
-    "hidden"
-  );
+  if (aiEditorPanel) {
+
+    aiEditorPanel.classList.add(
+      "hidden"
+    );
+
+  }
 
   selectedGenerationType =
     null;
@@ -2474,10 +2500,14 @@ function closeAiEditorPanel() {
 }
 
 
-closeAiEditor.addEventListener(
-  "click",
-  closeAiEditorPanel
-);
+if (closeAiEditor) {
+
+  closeAiEditor.addEventListener(
+    "click",
+    closeAiEditorPanel
+  );
+
+}
 
 
 closeAiEditorBottom.addEventListener(

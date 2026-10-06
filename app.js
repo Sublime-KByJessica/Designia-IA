@@ -886,28 +886,160 @@ productForm.addEventListener(
 
       try {
 
+        /*
+         * PHOTO
+         * Si une nouvelle photo est sélectionnée,
+         * on la téléverse avec un nouveau nom.
+         *
+         * Le nouveau nom évite également les problèmes
+         * de cache du navigateur.
+         */
+
+        let newPhotoPath =
+          editingProduct.photo_url || null;
+
+
+        if (file) {
+
+          const extension =
+            getFileExtension(
+              file.name
+            );
+
+
+          const filePath =
+            currentUser.id +
+            "/" +
+            editingProduct.id +
+            "-" +
+            Date.now() +
+            "." +
+            extension;
+
+
+          productMessage.textContent =
+            "Téléversement de la nouvelle photo...";
+
+
+          const {
+            error: uploadError
+          } =
+            await supabaseClient
+              .storage
+              .from("product-images")
+              .upload(
+                filePath,
+                file,
+                {
+                  cacheControl:
+                    "3600",
+
+                  upsert:
+                    false,
+
+                  contentType:
+                    file.type
+                }
+              );
+
+
+          if (uploadError) {
+            throw uploadError;
+          }
+
+
+          newPhotoPath =
+            filePath;
+
+
+          /*
+           * Enregistrer la nouvelle photo
+           * dans la bibliothèque des images du produit.
+           */
+
+          const {
+            error: imageError
+          } =
+            await supabaseClient
+              .from("product_images")
+              .insert({
+
+                product_id:
+                  editingProduct.id,
+
+                user_id:
+                  currentUser.id,
+
+                image_url:
+                  filePath,
+
+                image_type:
+                  "source"
+
+              });
+
+
+          if (imageError) {
+            throw imageError;
+          }
+
+        }
+
+
+        /*
+         * Préparation des données à enregistrer.
+         */
+
+        productMessage.textContent =
+          "Enregistrement des modifications...";
+
+
+        const updateData = {
+
+          name:
+            name,
+
+          category_id:
+            categoryId,
+
+          price:
+            price,
+
+          description:
+            productDescription
+              .value
+              .trim()
+
+        };
+
+
+        /*
+         * IMPORTANT :
+         * photo_url n'est modifié que si
+         * une nouvelle photo a réellement été choisie.
+         */
+
+        if (file) {
+
+          updateData.photo_url =
+            newPhotoPath;
+
+        }
+
+
+        /*
+         * Mise à jour du produit.
+         */
+
         const {
+          data: updatedProduct,
           error
         } =
           await supabaseClient
             .from("products")
-            .update({
-
-              name:
-                name,
-
-              category_id:
-                categoryId,
-
-              price:
-                price,
-
-              description:
-                productDescription
-                  .value
-                  .trim()
-
-            })
+            .update(
+              updateData
+            )
             .eq(
               "id",
               editingProduct.id
@@ -915,19 +1047,78 @@ productForm.addEventListener(
             .eq(
               "user_id",
               currentUser.id
-            );
+            )
+            .select()
+            .single();
+
 
         if (error) {
           throw error;
         }
 
+
+        /*
+         * Si le produit était déjà ouvert,
+         * on met également à jour le produit
+         * actuellement utilisé par Designia.
+         */
+
+        if (
+          currentProduct &&
+          currentProduct.id ===
+            editingProduct.id
+        ) {
+
+          currentProduct =
+            {
+              ...currentProduct,
+              ...updatedProduct
+            };
+
+        }
+
+
         productMessage.textContent =
-          "Produit modifié avec succès ✨";
+          file
+            ? "Produit et photo modifiés avec succès ✨"
+            : "Produit modifié avec succès ✨";
+
 
         editingProduct =
           null;
 
+
+        /*
+         * Recharge la liste des produits.
+         */
+
         await loadProducts();
+
+
+        /*
+         * Si le détail du produit était ouvert,
+         * on le recharge également avec la nouvelle photo.
+         */
+
+        if (
+          currentProduct &&
+          currentProduct.id ===
+            updatedProduct.id &&
+          !detailModal.classList.contains(
+            "hidden"
+          )
+        ) {
+
+          await openProductDetail(
+            updatedProduct
+          );
+
+        }
+
+
+        /*
+         * Fermer la fenêtre de modification.
+         */
 
         setTimeout(
           function () {
@@ -938,6 +1129,7 @@ productForm.addEventListener(
           700
         );
 
+
       } catch (error) {
 
         console.error(
@@ -945,9 +1137,11 @@ productForm.addEventListener(
           error
         );
 
+
         productMessage.textContent =
           error?.message ||
           "Impossible de modifier le produit.";
+
 
       } finally {
 
@@ -959,9 +1153,9 @@ productForm.addEventListener(
 
       }
 
+
       return;
     }
-
 
     /* =========================
        CRÉATION

@@ -521,185 +521,137 @@
              PANNEAU ÉDITION IA
         ========================== -->
 
-        <div
-          id="aiEditorPanel"
-          class="ai-editor-panel hidden"
-        >
+        <div class="ai-editor-layout">
 
-          <div class="ai-editor-header">
+  <div class="ai-preview-box">
 
-            <div>
+    <div class="ai-preview-title">
+      📸 Photo modèle pour la génération
+    </div>
 
-              <span class="ai-small-label">
-                PERSONNALISATION
-              </span>
+    <p class="ai-reference-help">
+      Sélectionne la photo du produit que l'IA doit utiliser.
+    </p>
 
-              <h3 id="aiEditorTitle">
-                ✨ Édition IA
-              </h3>
+    <div
+      id="referenceImageSelector"
+      class="reference-image-selector"
+    ></div>
 
-              <p id="aiEditorSubtitle">
-                Prépare ton futur visuel.
-              </p>
+    <div
+      id="aiGenerationPreview"
+      class="ai-generation-preview"
+    >
 
-            </div>
+      <span>
+        📷
+      </span>
 
-            <button
-              id="closeAiEditor"
-              class="ai-close-button"
-              type="button"
-            >
-              ×
-            </button>
+      <p>
+        Sélectionne une photo modèle
+      </p>
 
-          </div>
+    </div>
 
-
-         <div class="ai-preview-box">
-
-  <div class="ai-preview-title">
-    📸 Photo modèle pour la génération
   </div>
 
-  <p class="ai-reference-help">
-    Sélectionne la photo du produit que l'IA doit utiliser.
-  </p>
 
-  <div
-    id="referenceImageSelector"
-    class="reference-image-selector"
-  ></div>
+  <div class="ai-options">
 
-  <div
-    id="aiGenerationPreview"
-    class="ai-generation-preview"
-  >
+    <label for="aiStyle">
+      Style visuel
+    </label>
 
-    <span>
-      📷
-    </span>
+    <select id="aiStyle">
 
-    <p>
-      Sélectionne une photo modèle
-    </p>
+      <option value="professionnel">
+        Professionnel / lumineux
+      </option>
+
+      <option value="naturel">
+        Naturel / chaleureux
+      </option>
+
+      <option value="premium">
+        Premium / élégant
+      </option>
+
+      <option value="colore">
+        Coloré / dynamique
+      </option>
+
+      <option value="minimaliste">
+        Minimaliste / épuré
+      </option>
+
+    </select>
+
+
+    <label for="aiFormat">
+      Format du visuel
+    </label>
+
+    <select id="aiFormat">
+
+      <option value="carre">
+        Carré / boutique / Instagram
+      </option>
+
+      <option value="portrait">
+        Portrait / réseaux sociaux
+      </option>
+
+      <option value="paysage">
+        Paysage / présentation
+      </option>
+
+    </select>
+
+
+    <label for="aiInstructions">
+      Consigne personnalisée
+    </label>
+
+    <textarea
+      id="aiInstructions"
+      rows="5"
+      placeholder="Ex. Fond beige clair, ambiance douce, quelques fleurs séchées, rendu haut de gamme..."
+    ></textarea>
+
+
+    <div class="ai-info-box">
+
+      💡 <strong>Conseil :</strong>
+      décris surtout l'ambiance, le décor,
+      la lumière et les éléments que tu souhaites
+      autour du produit.
+
+    </div>
+
+
+    <div class="ai-editor-actions">
+
+      <button
+        id="closeAiEditorBottom"
+        class="secondary-button"
+        type="button"
+      >
+        Annuler
+      </button>
+
+      <button
+        id="prepareAiGeneration"
+        class="primary-button"
+        type="button"
+      >
+        ✨ Préparer le visuel
+      </button>
+
+    </div>
 
   </div>
 
 </div>
-
-              <div
-                id="aiGenerationPreview"
-                class="ai-generation-preview"
-              >
-
-                <span>
-                  📷
-                </span>
-
-                <p>
-                  Aperçu du produit
-                </p>
-
-              </div>
-
-            </div>
-
-
-            <div class="ai-options">
-
-              <label for="aiStyle">
-                Style visuel
-              </label>
-
-              <select id="aiStyle">
-
-                <option value="professionnel">
-                  Professionnel / lumineux
-                </option>
-
-                <option value="naturel">
-                  Naturel / chaleureux
-                </option>
-
-                <option value="premium">
-                  Premium / élégant
-                </option>
-
-                <option value="colore">
-                  Coloré / dynamique
-                </option>
-
-                <option value="minimaliste">
-                  Minimaliste / épuré
-                </option>
-
-              </select>
-
-
-              <label for="aiFormat">
-                Format du visuel
-              </label>
-
-              <select id="aiFormat">
-
-                <option value="carre">
-                  Carré / boutique / Instagram
-                </option>
-
-                <option value="portrait">
-                  Portrait / réseaux sociaux
-                </option>
-
-                <option value="paysage">
-                  Paysage / présentation
-                </option>
-
-              </select>
-
-
-              <label for="aiInstructions">
-                Consigne personnalisée
-              </label>
-
-              <textarea
-                id="aiInstructions"
-                rows="5"
-                placeholder="Ex. Fond beige clair, ambiance douce, quelques fleurs séchées, rendu haut de gamme..."
-              ></textarea>
-
-
-              <div class="ai-info-box">
-                💡 <strong>Conseil :</strong>
-                décris surtout l'ambiance, le décor,
-                la lumière et les éléments que tu souhaites
-                autour du produit.
-              </div>
-
-
-              <div class="ai-editor-actions">
-
-                <button
-                  id="closeAiEditorBottom"
-                  class="secondary-button"
-                  type="button"
-                >
-                  Annuler
-                </button>
-
-                <button
-                  id="prepareAiGeneration"
-                  class="primary-button"
-                  type="button"
-                >
-                  ✨ Préparer le visuel
-                </button>
-
-              </div>
-
-            </div>
-
-          </div>
-
 
           <!-- =========================
                HISTORIQUE

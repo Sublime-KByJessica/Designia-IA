@@ -1916,3 +1916,72 @@ select:focus-visible {
   font-style: normal;
   font-display: swap;
 }
+
+/* =====================================================
+   SÉLECTION PHOTO MODÈLE — ÉDITION IA
+===================================================== */
+
+.ai-reference-help {
+  margin: -5px 0 14px;
+  color: var(--texte-clair);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.reference-image-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.reference-image-option {
+  width: 78px;
+  height: 78px;
+  padding: 3px;
+  border: 2px solid var(--bordure);
+  border-radius: 12px;
+  background: var(--blanc);
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.reference-image-option:hover {
+  transform: translateY(-2px);
+}
+
+.reference-image-option.selected {
+  border-color: var(--rose);
+  box-shadow:
+    0 0 0 3px rgba(217, 143, 166, 0.20);
+}
+
+.reference-image-option img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 8px;
+}
+
+.reference-loading,
+.reference-empty {
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--beige);
+  color: var(--texte-clair);
+  font-size: 13px;
+}
+
+@media (max-width: 480px) {
+
+  .reference-image-option {
+    width: 65px;
+    height: 65px;
+  }
+
+}

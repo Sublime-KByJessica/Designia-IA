@@ -12,7 +12,8 @@ let categories = [];
 let authMode = "login";
 let editingProduct = null;
 let selectedGenerationType = null;
-
+let selectedReferenceImagePath = null;
+let productReferenceImages = [];
 
 /* =====================================================
    ÉLÉMENTS
@@ -199,6 +200,11 @@ const closeAiEditorBottom =
 const aiGenerationPreview =
   document.getElementById(
     "aiGenerationPreview"
+  );
+
+const referenceImageSelector =
+  document.getElementById(
+    "referenceImageSelector"
   );
 
 const generationHistory =
@@ -1761,12 +1767,12 @@ async function openProductDetail(
 
     '</div>';
 
+  selectedReferenceImagePath =
+  product.photo_url || null;
 
-  await prepareAiPreview(
-    imageUrl
-  );
+await loadProductReferenceImages();
 
-  await loadGenerationHistory();
+await loadGenerationHistory();
 
 }
 
@@ -1795,10 +1801,308 @@ async function prepareAiPreview(
   aiGenerationPreview.innerHTML =
     '<img src="' +
     imageUrl +
-    '" alt="Produit source">';
+    '" alt="Photo modèle sélectionnée">';
 
 }
 
+/* =====================================================
+   PHOTOS MODÈLES DU PRODUIT
+===================================================== */
+
+async function loadProductReferenceImages() {
+
+  if (
+    !currentProduct ||
+    !currentUser ||
+    !referenceImageSelector
+  ) {
+    return;
+  }
+
+  referenceImageSelector.innerHTML =
+    '<div class="reference-loading">' +
+    'Chargement des photos...' +
+    '</div>';
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("product_images")
+      .select("*")
+      .eq(
+        "product_id",
+        currentProduct.id
+      )
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .eq(
+        "image_type",
+        "source"
+      )
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+
+  if (error) {
+
+    console.error(
+      "Erreur photos modèles :",
+      error
+    );
+
+    productReferenceImages = [];
+
+  } else {
+
+    productReferenceImages =
+      data || [];
+
+  }
+
+
+  /*
+   * Sécurité :
+   * si la photo principale du produit
+   * n'est pas encore présente dans
+   * product_images, on l'ajoute visuellement.
+   */
+
+  if (
+    currentProduct.photo_url &&
+    !productReferenceImages.some(
+      function (image) {
+
+        return (
+          image.image_url ===
+          currentProduct.photo_url
+        );
+
+      }
+    )
+  ) {
+
+    productReferenceImages.unshift({
+
+      id:
+        "main-product-image",
+
+      product_id:
+        currentProduct.id,
+
+      user_id:
+        currentUser.id,
+
+      image_url:
+        currentProduct.photo_url,
+
+      image_type:
+        "source"
+
+    });
+
+  }
+
+
+  /*
+   * S'il n'y a aucune photo,
+   * on affiche un message.
+   */
+
+  if (
+    productReferenceImages.length === 0
+  ) {
+
+    referenceImageSelector.innerHTML =
+      '<div class="reference-empty">' +
+      'Aucune photo modèle disponible.' +
+      '</div>';
+
+    selectedReferenceImagePath =
+      null;
+
+    return;
+  }
+
+
+  /*
+   * Par défaut :
+   * on sélectionne la photo principale
+   * du produit.
+   */
+
+  if (
+    !selectedReferenceImagePath ||
+    !productReferenceImages.some(
+      function (image) {
+
+        return (
+          image.image_url ===
+          selectedReferenceImagePath
+        );
+
+      }
+    )
+  ) {
+
+    selectedReferenceImagePath =
+      currentProduct.photo_url ||
+      productReferenceImages[0].image_url;
+
+  }
+
+
+  referenceImageSelector.innerHTML =
+    "";
+
+
+  /*
+   * Création des vignettes
+   */
+
+  for (
+    const image of productReferenceImages
+  ) {
+
+    const imageUrl =
+      await getSignedImageUrl(
+        image.image_url
+      );
+
+    if (!imageUrl) {
+      continue;
+    }
+
+
+    const button =
+      document.createElement(
+        "button"
+      );
+
+    button.type =
+      "button";
+
+    button.className =
+      "reference-image-option";
+
+
+    if (
+      image.image_url ===
+      selectedReferenceImagePath
+    ) {
+
+      button.classList.add(
+        "selected"
+      );
+
+    }
+
+
+    button.innerHTML =
+      '<img src="' +
+      imageUrl +
+      '" alt="Photo modèle">';
+
+
+    button.addEventListener(
+      "click",
+      async function () {
+
+        /*
+         * Nouvelle photo sélectionnée
+         */
+
+        selectedReferenceImagePath =
+          image.image_url;
+
+
+        /*
+         * Mettre à jour
+         * la sélection visuelle
+         */
+
+        document
+          .querySelectorAll(
+            ".reference-image-option"
+          )
+          .forEach(
+            function (item) {
+
+              item.classList.remove(
+                "selected"
+              );
+
+            }
+          );
+
+
+        button.classList.add(
+          "selected"
+        );
+
+
+        /*
+         * Afficher la photo sélectionnée
+         * dans la grande zone
+         */
+
+        await prepareAiPreview(
+          imageUrl
+        );
+
+
+        generationMessage.textContent =
+          "Photo modèle sélectionnée ✨";
+
+      }
+    );
+
+
+    referenceImageSelector.appendChild(
+      button
+    );
+
+  }
+
+
+  /*
+   * Afficher immédiatement
+   * la photo sélectionnée.
+   */
+
+  const selectedImage =
+    productReferenceImages.find(
+      function (image) {
+
+        return (
+          image.image_url ===
+          selectedReferenceImagePath
+        );
+
+      }
+    );
+
+
+  if (selectedImage) {
+
+    const selectedUrl =
+      await getSignedImageUrl(
+        selectedImage.image_url
+      );
+
+    await prepareAiPreview(
+      selectedUrl
+    );
+
+  }
+
+}
 
 /* =====================================================
    OUVRIR ÉDITEUR IA
@@ -2296,10 +2600,21 @@ function buildGenerationPrompt() {
 
 async function getProductReferenceImageData() {
 
-  if (!currentProduct?.photo_url) {
+  /*
+   * Utilise la photo choisie par l'utilisateur.
+   * Si aucune sélection n'existe, on utilise
+   * exceptionnellement la photo principale.
+   */
+
+  const referencePath =
+    selectedReferenceImagePath ||
+    currentProduct?.photo_url;
+
+
+  if (!referencePath) {
 
     throw new Error(
-      "La photo du produit est indisponible."
+      "Sélectionne une photo modèle avant de générer."
     );
 
   }
@@ -2307,14 +2622,14 @@ async function getProductReferenceImageData() {
 
   const imageUrl =
     await getSignedImageUrl(
-      currentProduct.photo_url
+      referencePath
     );
 
 
   if (!imageUrl) {
 
     throw new Error(
-      "Impossible d'accéder à la photo du produit."
+      "Impossible d'accéder à la photo modèle sélectionnée."
     );
 
   }
@@ -2331,10 +2646,6 @@ async function getProductReferenceImageData() {
           new Image();
 
 
-        /*
-         * Autorise le navigateur à utiliser
-         * l'image distante dans le canvas.
-         */
         img.crossOrigin =
           "anonymous";
 
@@ -2352,7 +2663,7 @@ async function getProductReferenceImageData() {
 
             reject(
               new Error(
-                "Impossible de charger la photo du produit."
+                "Impossible de charger la photo modèle sélectionnée."
               )
             );
 
@@ -2365,6 +2676,93 @@ async function getProductReferenceImageData() {
       }
     );
 
+
+  /*
+   * Redimensionnement
+   * maximum 512 × 512
+   */
+
+  const maxSize =
+    512;
+
+
+  const largestSide =
+    Math.max(
+      image.naturalWidth,
+      image.naturalHeight
+    );
+
+
+  const scale =
+    Math.min(
+      1,
+      maxSize / largestSide
+    );
+
+
+  const width =
+    Math.max(
+      1,
+      Math.round(
+        image.naturalWidth *
+        scale
+      )
+    );
+
+
+  const height =
+    Math.max(
+      1,
+      Math.round(
+        image.naturalHeight *
+        scale
+      )
+    );
+
+
+  const canvas =
+    document.createElement(
+      "canvas"
+    );
+
+
+  canvas.width =
+    width;
+
+  canvas.height =
+    height;
+
+
+  const context =
+    canvas.getContext(
+      "2d"
+    );
+
+
+  if (!context) {
+
+    throw new Error(
+      "Impossible de préparer la photo modèle."
+    );
+
+  }
+
+
+  context.drawImage(
+    image,
+    0,
+    0,
+    width,
+    height
+  );
+
+
+  return canvas.toDataURL(
+    "image/jpeg",
+    0.9
+  );
+
+}
 
   /* =================================================
      REDIMENSIONNEMENT

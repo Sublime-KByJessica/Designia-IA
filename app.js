@@ -2940,6 +2940,262 @@ async function getProductReferenceImageData() {
    GÉNÉRATION DU VISUEL IA
 ===================================================== */
 
+/*
+ * Convertit une image Base64/data URL en Blob.
+ * Le Blob sera ensuite envoyé dans Supabase Storage.
+ */
+async function dataUrlToBlob(
+  dataUrl
+) {
+
+  if (
+    !dataUrl ||
+    !dataUrl.startsWith(
+      "data:image/"
+    )
+  ) {
+
+    throw new Error(
+      "Le visuel généré n'est pas dans un format image valide."
+    );
+
+  }
+
+
+  const response =
+    await fetch(
+      dataUrl
+    );
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      "Impossible de préparer le visuel généré."
+    );
+
+  }
+
+
+  return await response.blob();
+
+}
+
+
+/*
+ * Enregistre le visuel généré dans Supabase Storage.
+ *
+ * Le fichier est placé dans :
+ *
+ * utilisateur /
+ * produit /
+ * generations /
+ * generation-id.jpg
+ *
+ * La base de données ne contient ensuite
+ * que le chemin du fichier.
+ */
+async function saveGeneratedImageToStorage(
+  generatedImage,
+  generationId
+) {
+
+  if (
+    !currentUser ||
+    !currentProduct
+  ) {
+
+    throw new Error(
+      "Impossible d'enregistrer le visuel : utilisateur ou produit introuvable."
+    );
+
+  }
+
+
+  if (!generationId) {
+
+    throw new Error(
+      "Impossible d'enregistrer le visuel : identifiant de génération manquant."
+    );
+
+  }
+
+
+  const imageBlob =
+    await dataUrlToBlob(
+      generatedImage
+    );
+
+
+  const filePath =
+    currentUser.id +
+    "/" +
+    currentProduct.id +
+    "/generations/" +
+    generationId +
+    ".jpg";
+
+
+  console.log(
+    "📦 Enregistrement du visuel dans Storage :",
+    filePath
+  );
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .storage
+      .from(
+        "product-images"
+      )
+      .upload(
+        filePath,
+        imageBlob,
+        {
+          cacheControl:
+            "3600",
+          upsert:
+            false,
+          contentType:
+            "image/jpeg"
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "❌ Erreur enregistrement Storage :",
+      error
+    );
+
+
+    throw error;
+
+  }
+
+
+  console.log(
+    "✅ Visuel enregistré dans Storage"
+  );
+
+
+  return filePath;
+
+}
+
+
+/*
+ * Affiche immédiatement une image générée
+ * dans la zone de prévisualisation.
+ *
+ * Cette fonction ne dépend PAS de la base de données.
+ * L'image reste donc visible même si l'enregistrement
+ * rencontre ensuite un problème.
+ */
+function displayGeneratedAiImage(
+  generatedImage
+) {
+
+  if (
+    !aiGenerationPreview
+  ) {
+
+    throw new Error(
+      "La zone d'affichage du visuel IA est introuvable dans la page."
+    );
+
+  }
+
+
+  aiGenerationPreview.innerHTML =
+    "";
+
+
+  const generatedImageElement =
+    document.createElement(
+      "img"
+    );
+
+
+  generatedImageElement.src =
+    generatedImage;
+
+
+  generatedImageElement.alt =
+    "Image générée par Designia AI";
+
+
+  generatedImageElement.className =
+    "generated-ai-image";
+
+
+  generatedImageElement.style.display =
+    "block";
+
+
+  generatedImageElement.style.width =
+    "100%";
+
+
+  generatedImageElement.style.height =
+    "auto";
+
+
+  generatedImageElement.style.maxWidth =
+    "100%";
+
+
+  generatedImageElement.style.borderRadius =
+    "16px";
+
+
+  generatedImageElement.style.objectFit =
+    "contain";
+
+
+  generatedImageElement.onload =
+    function () {
+
+      console.log(
+        "✅ IMAGE IA AFFICHÉE AVEC SUCCÈS"
+      );
+
+    };
+
+
+  generatedImageElement.onerror =
+    function () {
+
+      console.error(
+        "❌ L'image a été reçue mais le navigateur ne peut pas l'afficher."
+      );
+
+    };
+
+
+  aiGenerationPreview.appendChild(
+    generatedImageElement
+  );
+
+
+  console.log(
+    "Image ajoutée à aiGenerationPreview :",
+    aiGenerationPreview.querySelector(
+      "img"
+    )
+      ? "OUI"
+      : "NON"
+  );
+
+
+  return generatedImageElement;
+
+}
+
+
 prepareAiGeneration.addEventListener(
   "click",
   async function () {
@@ -2994,6 +3250,25 @@ prepareAiGeneration.addEventListener(
       null;
 
 
+    let generatedImage =
+      null;
+
+
+    let generatedStoragePath =
+      null;
+
+
+    /*
+     * Permet de savoir si l'image a déjà été
+     * générée et affichée.
+     *
+     * Ainsi, une erreur d'enregistrement ne
+     * supprimera pas une image correctement générée.
+     */
+    let imageGenerated =
+      false;
+
+
     try {
 
       /* =========================
@@ -3038,6 +3313,12 @@ prepareAiGeneration.addEventListener(
 
       generationId =
         generation.id;
+
+
+      console.log(
+        "✅ Demande de génération enregistrée :",
+        generationId
+      );
 
 
       /* =========================
@@ -3201,7 +3482,7 @@ prepareAiGeneration.addEventListener(
       }
 
 
-      const generatedImage =
+      generatedImage =
         aiData.image;
 
 
@@ -3247,118 +3528,54 @@ prepareAiGeneration.addEventListener(
 
 
       /* =====================================================
-         AFFICHAGE IMMÉDIAT DE L'IMAGE
+         4. AFFICHAGE IMMÉDIAT
       ===================================================== */
 
       generationMessage.textContent =
-        "Affichage du visuel généré...";
+        "🖼️ Affichage du visuel généré...";
 
 
-      if (!aiGenerationPreview) {
-
-        throw new Error(
-          "La zone d'affichage du visuel IA est introuvable dans la page."
-        );
-
-      }
-
-
-      aiGenerationPreview.innerHTML =
-        "";
-
-
-      const generatedImageElement =
-        document.createElement(
-          "img"
-        );
-
-
-      generatedImageElement.src =
-        generatedImage;
-
-
-      generatedImageElement.alt =
-        "Image générée par Designia AI";
-
-
-      generatedImageElement.className =
-        "generated-ai-image";
-
-
-      generatedImageElement.style.display =
-        "block";
-
-
-      generatedImageElement.style.width =
-        "100%";
-
-
-      generatedImageElement.style.height =
-        "auto";
-
-
-      generatedImageElement.style.maxWidth =
-        "100%";
-
-
-      generatedImageElement.style.borderRadius =
-        "16px";
-
-
-      generatedImageElement.style.objectFit =
-        "contain";
-
-
-      generatedImageElement.onload =
-        function () {
-
-          console.log(
-            "✅ IMAGE IA AFFICHÉE AVEC SUCCÈS"
-          );
-
-
-          generationMessage.textContent =
-            "Visuel généré et affiché ✨";
-
-        };
-
-
-      generatedImageElement.onerror =
-        function () {
-
-          console.error(
-            "❌ L'image a été reçue mais le navigateur ne peut pas l'afficher."
-          );
-
-
-          generationMessage.textContent =
-            "L'image a été reçue mais son affichage a échoué.";
-
-        };
-
-
-      aiGenerationPreview.appendChild(
-        generatedImageElement
+      displayGeneratedAiImage(
+        generatedImage
       );
+
+
+      /*
+       * À partir d'ici, l'image est considérée
+       * comme correctement générée.
+       *
+       * Une éventuelle erreur Storage ou base
+       * ne doit donc PLUS faire disparaître
+       * l'image de l'écran.
+       */
+      imageGenerated =
+        true;
+
+
+      generationMessage.textContent =
+        "💾 Enregistrement du visuel généré...";
+
+
+      /* =====================================================
+         5. ENREGISTRER L'IMAGE DANS STORAGE
+      ===================================================== */
+
+      generatedStoragePath =
+        await saveGeneratedImageToStorage(
+          generatedImage,
+          generationId
+        );
 
 
       console.log(
-        "Image ajoutée à aiGenerationPreview :",
-        aiGenerationPreview.querySelector(
-          "img"
-        )
-          ? "OUI"
-          : "NON"
+        "Chemin Storage du visuel :",
+        generatedStoragePath
       );
 
 
-      /* =========================
-         4. ENREGISTRER LE VISUEL
-      ========================== */
-
-      generationMessage.textContent =
-        "Enregistrement du visuel généré...";
-
+      /* =====================================================
+         6. ENREGISTRER LE CHEMIN DANS LA BASE
+      ===================================================== */
 
       const {
         error: updateError
@@ -3370,7 +3587,7 @@ prepareAiGeneration.addEventListener(
           .update({
 
             result_url:
-              generatedImage
+              generatedStoragePath
 
           })
           .eq(
@@ -3385,14 +3602,40 @@ prepareAiGeneration.addEventListener(
 
       if (updateError) {
 
+        console.error(
+          "❌ Erreur enregistrement base de données :",
+          updateError
+        );
+
+
+        /*
+         * Le visuel reste affiché.
+         * On indique simplement que l'enregistrement
+         * permanent n'a pas fonctionné.
+         */
+        generationMessage.textContent =
+          "Visuel généré, mais l'enregistrement a rencontré un problème.";
+
+
+        /*
+         * On ne supprime PAS la ligne de génération
+         * ici : cela permet de conserver la demande
+         * pour faciliter le diagnostic.
+         */
+
         throw updateError;
 
       }
 
 
-      /* =========================
-         5. ACTUALISER L'HISTORIQUE
-      ========================== */
+      console.log(
+        "✅ Chemin du visuel enregistré dans la base"
+      );
+
+
+      /* =====================================================
+         7. ACTUALISER L'HISTORIQUE
+      ===================================================== */
 
       await loadGenerationHistory();
 
@@ -3413,17 +3656,45 @@ prepareAiGeneration.addEventListener(
       );
 
 
-      generationMessage.textContent =
-        error?.message ||
-        "Impossible de générer le visuel.";
+      /*
+       * IMPORTANT :
+       *
+       * Si l'image a déjà été générée et affichée,
+       * on NE la retire PAS de l'écran.
+       */
+      if (
+        imageGenerated
+      ) {
+
+        generationMessage.textContent =
+          "Visuel généré ✨ " +
+          (
+            generatedStoragePath
+              ? "Il est enregistré."
+              : "L'enregistrement doit être vérifié."
+          );
+
+      } else {
+
+        generationMessage.textContent =
+          error?.message ||
+          "Impossible de générer le visuel.";
+
+      }
 
 
-      /* =========================
-         SUPPRIMER LA DEMANDE
-         SI LA GÉNÉRATION ÉCHOUE
-      ========================== */
-
-      if (generationId) {
+      /*
+       * Si aucune image n'a été générée,
+       * la demande initiale peut être supprimée.
+       *
+       * Si une image existe déjà, on conserve
+       * la demande pour éviter de perdre la trace
+       * de la génération.
+       */
+      if (
+        generationId &&
+        !imageGenerated
+      ) {
 
         await supabaseClient
           .from(
@@ -3546,53 +3817,76 @@ async function loadGenerationHistory() {
     "";
 
 
-  data.forEach(
-    function (generation) {
+  /*
+   * Les URL signées sont préparées avant
+   * l'affichage de chaque élément.
+   */
+  for (
+    const generation of data
+  ) {
 
-      const type =
-        generationLabels[
-          generation.generation_type
-        ];
-
-
-      const title =
-        type?.title ||
-        generation.generation_type ||
-        "Visuel";
-
-
-      const date =
-        generation.created_at
-          ? new Date(
-              generation.created_at
-            ).toLocaleString(
-              "fr-FR"
-            )
-          : "";
+    const type =
+      generationLabels[
+        generation.generation_type
+      ];
 
 
-      const item =
-        document.createElement(
-          "div"
+    const title =
+      type?.title ||
+      generation.generation_type ||
+      "Visuel";
+
+
+    const date =
+      generation.created_at
+        ? new Date(
+            generation.created_at
+          ).toLocaleString(
+            "fr-FR"
+          )
+        : "";
+
+
+    const item =
+      document.createElement(
+        "div"
+      );
+
+
+    item.className =
+      "history-item";
+
+
+    let preview =
+      "";
+
+
+    let signedGenerationUrl =
+      null;
+
+
+    /*
+     * result_url contient maintenant
+     * le chemin Storage.
+     */
+    if (
+      generation.result_url
+    ) {
+
+      signedGenerationUrl =
+        await getSignedImageUrl(
+          generation.result_url
         );
 
 
-      item.className =
-        "history-item";
-
-
-      let preview =
-        "";
-
-
       if (
-        generation.result_url
+        signedGenerationUrl
       ) {
 
         preview =
           '<img ' +
           'src="' +
-          generation.result_url +
+          signedGenerationUrl +
           '" ' +
           'alt="Visuel généré" ' +
           'class="history-preview-image">';
@@ -3601,90 +3895,104 @@ async function loadGenerationHistory() {
 
         preview =
           '<div class="history-preview-empty">' +
-          "⏳" +
+          "⚠️" +
           "</div>";
 
       }
 
+    } else {
 
-      item.innerHTML =
+      preview =
+        '<div class="history-preview-empty">' +
+        "⏳" +
+        "</div>";
 
-        '<div class="history-preview">' +
+    }
 
-        preview +
 
-        "</div>" +
+    item.innerHTML =
 
-        '<div class="history-item-info">' +
+      '<div class="history-preview">' +
 
-        "<strong>" +
+      preview +
 
-        escapeHtml(
-          title
-        ) +
+      "</div>" +
 
-        "</strong>" +
+      '<div class="history-item-info">' +
 
-        "<small>" +
+      "<strong>" +
 
-        escapeHtml(
-          date
-        ) +
+      escapeHtml(
+        title
+      ) +
 
-        "</small>" +
+      "</strong>" +
 
-        "</div>" +
+      "<small>" +
 
-        '<span class="history-status">' +
+      escapeHtml(
+        date
+      ) +
 
-        (
-          generation.result_url
-            ? "Disponible"
+      "</small>" +
+
+      "</div>" +
+
+      '<span class="history-status">' +
+
+      (
+        signedGenerationUrl
+          ? "Disponible"
+          : generation.result_url
+            ? "Erreur image"
             : "En attente"
-        ) +
+      ) +
 
-        "</span>";
-
-
-      if (
-        generation.result_url
-      ) {
-
-        item.style.cursor =
-          "pointer";
+      "</span>";
 
 
-        item.addEventListener(
-          "click",
-          function () {
+    /*
+     * Si l'image existe, cliquer dessus
+     * la recharge dans la grande zone de prévisualisation.
+     */
+    if (
+      signedGenerationUrl
+    ) {
 
-            aiGenerationPreview.innerHTML =
-              '<img ' +
-              'src="' +
-              generation.result_url +
-              '" ' +
-              'alt="Visuel généré par IA" ' +
-              'class="generated-ai-image">';
-
-
-            generationMessage.textContent =
-              "Visuel chargé depuis l’historique ✨";
-
-          }
-        );
-
-      }
+      item.style.cursor =
+        "pointer";
 
 
-      generationHistory.appendChild(
-        item
+      item.addEventListener(
+        "click",
+        function () {
+
+          aiGenerationPreview.innerHTML =
+            '<img ' +
+            'src="' +
+            signedGenerationUrl +
+            '" ' +
+            'alt="Visuel généré par IA" ' +
+            'class="generated-ai-image" ' +
+            'style="display:block;width:100%;height:auto;max-width:100%;border-radius:16px;object-fit:contain;">';
+
+
+          generationMessage.textContent =
+            "Visuel chargé depuis l’historique ✨";
+
+        }
       );
 
     }
-  );
+
+
+    generationHistory.appendChild(
+      item
+    );
+
+  }
 
 }
-
 
 /* =====================================================
    FERMER DÉTAIL

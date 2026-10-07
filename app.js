@@ -2904,27 +2904,198 @@ prepareAiGeneration.addEventListener(
 
 
       const {
-        data: aiData,
-        error: aiError
-      } =
-        await supabaseClient
-          .functions
-          .invoke(
-            "clever-processor",
-            {
+  data: aiData,
+  error: aiError
+} =
+  await supabaseClient
+    .functions
+    .invoke(
+      "clever-processor",
+      {
+        body: {
+          prompt: prompt,
+          image_data: imageData
+        }
+      }
+    );
 
-              body: {
 
-                prompt:
-                  prompt,
+/* =====================================================
+   DIAGNOSTIC — RÉPONSE DE L'IA
+===================================================== */
 
-                image_data:
-                  imageData
+console.log(
+  "========== DESIGNIA AI =========="
+);
 
-              }
+console.log(
+  "Erreur Supabase :",
+  aiError
+);
 
-            }
-          );
+console.log(
+  "Réponse complète Supabase :",
+  aiData
+);
+
+console.log(
+  "Image reçue :",
+  aiData?.image
+    ? "OUI"
+    : "NON"
+);
+
+if (aiData?.image) {
+
+  console.log(
+    "Longueur de l'image :",
+    aiData.image.length
+  );
+
+  console.log(
+    "Début de l'image :",
+    aiData.image.substring(0, 80)
+  );
+
+}
+
+
+/* =====================================================
+   GESTION DES ERREURS
+===================================================== */
+
+if (aiError) {
+
+  let serverMessage = "";
+
+  try {
+
+    if (aiError.context) {
+
+      const response =
+        aiError.context;
+
+      if (
+        typeof response.json ===
+        "function"
+      ) {
+
+        const errorBody =
+          await response.json();
+
+        serverMessage =
+          errorBody?.error ||
+          "";
+
+      }
+
+    }
+
+  } catch (error) {
+
+    console.warn(
+      "Impossible de lire le détail de l'erreur IA.",
+      error
+    );
+
+  }
+
+  throw new Error(
+    serverMessage ||
+    aiError.message ||
+    "La génération IA a échoué."
+  );
+
+}
+
+
+if (!aiData) {
+
+  throw new Error(
+    "Aucune réponse n'a été reçue du serveur IA."
+  );
+
+}
+
+
+if (!aiData.image) {
+
+  console.error(
+    "La génération semble avoir répondu, mais aucune image n'est présente dans aiData."
+  );
+
+  throw new Error(
+    "L'image a été générée mais Designia n'a reçu aucun visuel."
+  );
+
+}
+
+
+/* =====================================================
+   VÉRIFICATION DU FORMAT IMAGE
+===================================================== */
+
+const generatedImage =
+  aiData.image;
+
+console.log(
+  "Image finale prête à être affichée :",
+  generatedImage.substring(0, 80)
+);
+
+
+/* =====================================================
+   AFFICHAGE IMMÉDIAT DE L'IMAGE
+===================================================== */
+
+if (aiGenerationPreview) {
+
+  aiGenerationPreview.innerHTML = "";
+
+  const generatedImageElement =
+    document.createElement("img");
+
+  generatedImageElement.src =
+    generatedImage;
+
+  generatedImageElement.alt =
+    "Image générée par Designia AI";
+
+  generatedImageElement.style.width =
+    "100%";
+
+  generatedImageElement.style.height =
+    "auto";
+
+  generatedImageElement.style.display =
+    "block";
+
+  generatedImageElement.style.borderRadius =
+    "16px";
+
+  generatedImageElement.onload =
+    function () {
+
+      console.log(
+        "✅ IMAGE AFFICHÉE CORRECTEMENT DANS DESIGNIA"
+      );
+
+    };
+
+  generatedImageElement.onerror =
+    function () {
+
+      console.error(
+        "❌ L'image a été reçue mais le navigateur ne parvient pas à l'afficher."
+      );
+
+    };
+
+  aiGenerationPreview.appendChild(
+    generatedImageElement
+  );
+
+}
 
 
       if (aiError) {

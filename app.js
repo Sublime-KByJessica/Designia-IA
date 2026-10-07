@@ -2699,7 +2699,7 @@ async function getProductReferenceImageData() {
    */
 
   const maxSize =
-    512;
+    511;
 
 
   const largestSide =

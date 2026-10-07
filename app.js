@@ -1508,6 +1508,23 @@ async function getSignedImageUrl(
     return null;
   }
 
+  /*
+   * Compatibilité avec les anciens visuels :
+   * certains anciens enregistrements contiennent
+   * déjà une URL complète ou une data URL.
+   * Dans ce cas, on utilise directement cette URL.
+   */
+  if (
+    typeof path === "string" &&
+    (
+      path.startsWith("http://") ||
+      path.startsWith("https://") ||
+      path.startsWith("data:image/")
+    )
+  ) {
+    return path;
+  }
+
 
   const {
     data,

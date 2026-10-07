@@ -1,10 +1,16 @@
-const SUPABASE_URL = "https://ccxxylgyplmrifpdaeig.supabase.co";
-const SUPABASE_KEY = "sb_publishable_wHGieMuIRhyXYq4tDOliIg_D7pxnOMP";
+const SUPABASE_URL =
+  "https://ccxxylgyplmrifpdaeig.supabase.co";
 
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+const SUPABASE_KEY =
+  "sb_publishable_wHGieMuIRhyXYq4tDOliIg_D7pxnOMP";
+
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
 
 let currentUser = null;
 let currentProduct = null;
@@ -14,6 +20,7 @@ let editingProduct = null;
 let selectedGenerationType = null;
 let selectedReferenceImagePath = null;
 let productReferenceImages = [];
+
 
 /* =====================================================
    ÉLÉMENTS
@@ -147,6 +154,7 @@ const generationMessage =
     "generationMessage"
   );
 
+
 /* =====================================================
    ÉLÉMENTS ÉDITION IA
 ===================================================== */
@@ -154,16 +162,6 @@ const generationMessage =
 const aiEditorPanel =
   document.querySelector(
     ".ai-editor-layout"
-  );
-
-const aiEditorTitle =
-  document.getElementById(
-    "aiEditorTitle"
-  );
-
-const aiEditorSubtitle =
-  document.getElementById(
-    "aiEditorSubtitle"
   );
 
 const aiStyle =
@@ -184,11 +182,6 @@ const aiInstructions =
 const prepareAiGeneration =
   document.getElementById(
     "prepareAiGeneration"
-  );
-
-const closeAiEditor =
-  document.getElementById(
-    "closeAiEditor"
   );
 
 const closeAiEditorBottom =
@@ -251,13 +244,15 @@ const personalizationFont =
     "personalizationFont"
   );
 
+
 /* =====================================================
    CONNEXION / INSCRIPTION
 ===================================================== */
 
 function setAuthMode(mode) {
 
-  authMode = mode;
+  authMode =
+    mode;
 
   loginTab.classList.toggle(
     "active",
@@ -274,7 +269,8 @@ function setAuthMode(mode) {
       ? "Se connecter"
       : "Créer mon compte";
 
-  authMessage.textContent = "";
+  authMessage.textContent =
+    "";
 }
 
 
@@ -282,7 +278,9 @@ loginTab.addEventListener(
   "click",
   function () {
 
-    setAuthMode("login");
+    setAuthMode(
+      "login"
+    );
 
   }
 );
@@ -292,7 +290,9 @@ signupTab.addEventListener(
   "click",
   function () {
 
-    setAuthMode("signup");
+    setAuthMode(
+      "signup"
+    );
 
   }
 );
@@ -304,7 +304,9 @@ signupTab.addEventListener(
 
 function escapeHtml(value) {
 
-  return String(value ?? "")
+  return String(
+    value ?? ""
+  )
     .replace(
       /&/g,
       "&amp;"
@@ -344,7 +346,11 @@ authForm.addEventListener(
     const password =
       passwordInput.value;
 
-    if (!email || !password) {
+
+    if (
+      !email ||
+      !password
+    ) {
 
       authMessage.textContent =
         "Merci de remplir tous les champs.";
@@ -352,7 +358,10 @@ authForm.addEventListener(
       return;
     }
 
-    authButton.disabled = true;
+
+    authButton.disabled =
+      true;
+
 
     authMessage.textContent =
       authMode === "login"
@@ -362,26 +371,35 @@ authForm.addEventListener(
 
     try {
 
-      if (authMode === "login") {
+      if (
+        authMode === "login"
+      ) {
 
         const {
           data,
           error
         } =
-          await supabaseClient.auth
+          await supabaseClient
+            .auth
             .signInWithPassword({
-              email: email,
-              password: password
+              email:
+                email,
+              password:
+                password
             });
+
 
         if (error) {
           throw error;
         }
 
+
         currentUser =
           data.user;
 
+
         await showDashboard();
+
 
       } else {
 
@@ -389,17 +407,24 @@ authForm.addEventListener(
           data,
           error
         } =
-          await supabaseClient.auth
+          await supabaseClient
+            .auth
             .signUp({
-              email: email,
-              password: password
+              email:
+                email,
+              password:
+                password
             });
+
 
         if (error) {
           throw error;
         }
 
-        if (data.session) {
+
+        if (
+          data.session
+        ) {
 
           currentUser =
             data.user;
@@ -412,14 +437,19 @@ authForm.addEventListener(
             "Compte créé ! Vérifie ton e-mail si une confirmation est demandée.";
 
         }
+
       }
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        error
+      );
 
       authMessage.textContent =
-        getAuthErrorMessage(error);
+        getAuthErrorMessage(
+          error
+        );
 
     } finally {
 
@@ -427,6 +457,7 @@ authForm.addEventListener(
         false;
 
     }
+
   }
 );
 
@@ -435,13 +466,17 @@ authForm.addEventListener(
    ERREURS CONNEXION
 ===================================================== */
 
-function getAuthErrorMessage(error) {
+function getAuthErrorMessage(
+  error
+) {
 
   const message =
-    error?.message || "";
+    error?.message ||
+    "";
 
   const lower =
     message.toLowerCase();
+
 
   if (
     lower.includes(
@@ -450,7 +485,9 @@ function getAuthErrorMessage(error) {
   ) {
 
     return "E-mail ou mot de passe incorrect.";
+
   }
+
 
   if (
     lower.includes(
@@ -459,19 +496,26 @@ function getAuthErrorMessage(error) {
   ) {
 
     return "Cette adresse e-mail possède déjà un compte.";
+
   }
 
+
   if (
-    lower.includes("password")
+    lower.includes(
+      "password"
+    )
   ) {
 
     return "Le mot de passe doit respecter les conditions demandées.";
+
   }
+
 
   return (
     message ||
     "Une erreur est survenue. Réessaie."
   );
+
 }
 
 
@@ -488,6 +532,7 @@ function showAuth() {
   dashboard.classList.add(
     "hidden"
   );
+
 }
 
 
@@ -501,9 +546,11 @@ async function showDashboard() {
     "hidden"
   );
 
+
   await loadCategories();
 
   await loadProducts();
+
 }
 
 
@@ -517,19 +564,27 @@ async function checkSession() {
     data,
     error
   } =
-    await supabaseClient.auth
+    await supabaseClient
+      .auth
       .getSession();
+
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
 
     showAuth();
 
     return;
+
   }
 
-  if (data.session) {
+
+  if (
+    data.session
+  ) {
 
     currentUser =
       data.session.user;
@@ -541,6 +596,7 @@ async function checkSession() {
     showAuth();
 
   }
+
 }
 
 
@@ -552,10 +608,12 @@ logoutButton.addEventListener(
   "click",
   async function () {
 
-    await supabaseClient.auth
+    await supabaseClient
+      .auth
       .signOut();
 
-    currentUser = null;
+    currentUser =
+      null;
 
     showAuth();
 
@@ -574,14 +632,18 @@ async function loadCategories() {
     error
   } =
     await supabaseClient
-      .from("categories")
+      .from(
+        "categories"
+      )
       .select("*")
       .order(
         "name",
         {
-          ascending: true
+          ascending:
+            true
         }
       );
+
 
   if (error) {
 
@@ -591,13 +653,17 @@ async function loadCategories() {
     );
 
     return;
+
   }
+
 
   categories =
     data || [];
 
+
   productCategory.innerHTML =
     '<option value="">Choisir une catégorie</option>';
+
 
   categories.forEach(
     function (category) {
@@ -607,11 +673,14 @@ async function loadCategories() {
           "option"
         );
 
+
       option.value =
         category.id;
 
+
       option.textContent =
         category.name;
+
 
       productCategory.appendChild(
         option
@@ -619,6 +688,7 @@ async function loadCategories() {
 
     }
   );
+
 }
 
 
@@ -634,13 +704,17 @@ function openProductModal(
     "hidden"
   );
 
+
   productForm.reset();
+
 
   productMessage.textContent =
     "";
 
+
   editingProduct =
     product;
+
 
   productPhoto.required =
     !product;
@@ -649,18 +723,26 @@ function openProductModal(
   if (product) {
 
     productModal
-      .querySelector("h2")
+      .querySelector(
+        "h2"
+      )
       .textContent =
         "Modifier le produit";
+
 
     saveProductButton.textContent =
       "Enregistrer les modifications";
 
+
     productName.value =
-      product.name || "";
+      product.name ||
+      "";
+
 
     productCategory.value =
-      product.category_id || "";
+      product.category_id ||
+      "";
+
 
     productPrice.value =
       product.price !== null &&
@@ -668,35 +750,46 @@ function openProductModal(
         ? Number(
             product.price
           )
-            .toFixed(2)
+            .toFixed(
+              2
+            )
             .replace(
               ".",
               ","
             )
         : "";
 
+
     productDescription.value =
-      product.description || "";
+      product.description ||
+      "";
+
 
     photoPreview.innerHTML =
       "<span>📷</span>" +
       "<p>Photo actuelle conservée</p>";
 
+
   } else {
 
     productModal
-      .querySelector("h2")
+      .querySelector(
+        "h2"
+      )
       .textContent =
         "Créer un produit";
 
+
     saveProductButton.textContent =
       "Créer le produit";
+
 
     photoPreview.innerHTML =
       "<span>📷</span>" +
       "<p>Sélectionne une photo</p>";
 
   }
+
 }
 
 
@@ -706,11 +799,14 @@ function closeProductCreationModal() {
     "hidden"
   );
 
+
   editingProduct =
     null;
 
+
   productPhoto.required =
     true;
+
 }
 
 
@@ -757,6 +853,7 @@ productPhoto.addEventListener(
     const file =
       productPhoto.files[0];
 
+
     if (!file) {
 
       photoPreview.innerHTML =
@@ -764,7 +861,9 @@ productPhoto.addEventListener(
         "<p>Sélectionne une photo</p>";
 
       return;
+
     }
+
 
     if (
       file.size >
@@ -774,15 +873,20 @@ productPhoto.addEventListener(
       productPhoto.value =
         "";
 
+
       photoPreview.innerHTML =
         "<span>⚠️</span>" +
         "<p>La photo dépasse 10 Mo.</p>";
 
+
       return;
+
     }
+
 
     const reader =
       new FileReader();
+
 
     reader.onload =
       function (event) {
@@ -794,7 +898,10 @@ productPhoto.addEventListener(
 
       };
 
-    reader.readAsDataURL(file);
+
+    reader.readAsDataURL(
+      file
+    );
 
   }
 );
@@ -809,15 +916,25 @@ function getFileExtension(
 ) {
 
   const parts =
-    filename.split(".");
+    filename.split(
+      "."
+    );
 
-  if (parts.length < 2) {
+
+  if (
+    parts.length <
+    2
+  ) {
+
     return "jpg";
+
   }
+
 
   return parts[
     parts.length - 1
   ].toLowerCase();
+
 }
 
 
@@ -831,23 +948,29 @@ productForm.addEventListener(
 
     event.preventDefault();
 
+
     if (!currentUser) {
 
       productMessage.textContent =
         "Ta session a expiré. Reconnecte-toi.";
 
       return;
+
     }
+
 
     const file =
       productPhoto.files[0];
 
+
     const name =
       productName.value.trim();
+
 
     const categoryId =
       productCategory.value ||
       null;
+
 
     const priceText =
       productPrice.value
@@ -857,16 +980,21 @@ productForm.addEventListener(
           "."
         );
 
+
     const price =
       priceText !== ""
-        ? Number(priceText)
+        ? Number(
+            priceText
+          )
         : null;
 
 
     if (
       price !== null &&
       (
-        !Number.isFinite(price) ||
+        !Number.isFinite(
+          price
+        ) ||
         price < 0
       )
     ) {
@@ -875,6 +1003,7 @@ productForm.addEventListener(
         "Indique un prix valide, par exemple 4,90 €.";
 
       return;
+
     }
 
 
@@ -887,22 +1016,16 @@ productForm.addEventListener(
       saveProductButton.disabled =
         true;
 
+
       saveProductButton.textContent =
         "Modification en cours...";
 
+
       try {
 
-        /*
-         * PHOTO
-         * Si une nouvelle photo est sélectionnée,
-         * on la téléverse avec un nouveau nom.
-         *
-         * Le nouveau nom évite également les problèmes
-         * de cache du navigateur.
-         */
-
         let newPhotoPath =
-          editingProduct.photo_url || null;
+          editingProduct.photo_url ||
+          null;
 
 
         if (file) {
@@ -932,17 +1055,17 @@ productForm.addEventListener(
           } =
             await supabaseClient
               .storage
-              .from("product-images")
+              .from(
+                "product-images"
+              )
               .upload(
                 filePath,
                 file,
                 {
                   cacheControl:
                     "3600",
-
                   upsert:
                     false,
-
                   contentType:
                     file.type
                 }
@@ -958,30 +1081,22 @@ productForm.addEventListener(
             filePath;
 
 
-          /*
-           * Enregistrer la nouvelle photo
-           * dans la bibliothèque des images du produit.
-           */
-
           const {
             error: imageError
           } =
             await supabaseClient
-              .from("product_images")
+              .from(
+                "product_images"
+              )
               .insert({
-
                 product_id:
                   editingProduct.id,
-
                 user_id:
                   currentUser.id,
-
                 image_url:
                   filePath,
-
                 image_type:
                   "source"
-
               });
 
 
@@ -991,10 +1106,6 @@ productForm.addEventListener(
 
         }
 
-
-        /*
-         * Préparation des données à enregistrer.
-         */
 
         productMessage.textContent =
           "Enregistrement des modifications...";
@@ -1019,12 +1130,6 @@ productForm.addEventListener(
         };
 
 
-        /*
-         * IMPORTANT :
-         * photo_url n'est modifié que si
-         * une nouvelle photo a réellement été choisie.
-         */
-
         if (file) {
 
           updateData.photo_url =
@@ -1033,16 +1138,14 @@ productForm.addEventListener(
         }
 
 
-        /*
-         * Mise à jour du produit.
-         */
-
         const {
           data: updatedProduct,
           error
         } =
           await supabaseClient
-            .from("products")
+            .from(
+              "products"
+            )
             .update(
               updateData
             )
@@ -1062,12 +1165,6 @@ productForm.addEventListener(
           throw error;
         }
 
-
-        /*
-         * Si le produit était déjà ouvert,
-         * on met également à jour le produit
-         * actuellement utilisé par Designia.
-         */
 
         if (
           currentProduct &&
@@ -1094,17 +1191,8 @@ productForm.addEventListener(
           null;
 
 
-        /*
-         * Recharge la liste des produits.
-         */
-
         await loadProducts();
 
-
-        /*
-         * Si le détail du produit était ouvert,
-         * on le recharge également avec la nouvelle photo.
-         */
 
         if (
           currentProduct &&
@@ -1121,10 +1209,6 @@ productForm.addEventListener(
 
         }
 
-
-        /*
-         * Fermer la fenêtre de modification.
-         */
 
         setTimeout(
           function () {
@@ -1154,6 +1238,7 @@ productForm.addEventListener(
         saveProductButton.disabled =
           false;
 
+
         saveProductButton.textContent =
           "Enregistrer les modifications";
 
@@ -1161,7 +1246,9 @@ productForm.addEventListener(
 
 
       return;
+
     }
+
 
     /* =========================
        CRÉATION
@@ -1177,6 +1264,7 @@ productForm.addEventListener(
         "Ajoute une photo du produit.";
 
       return;
+
     }
 
 
@@ -1186,11 +1274,13 @@ productForm.addEventListener(
         "Indique le nom du produit.";
 
       return;
+
     }
 
 
     saveProductButton.disabled =
       true;
+
 
     saveProductButton.textContent =
       "Création en cours...";
@@ -1203,54 +1293,54 @@ productForm.addEventListener(
 
 
       const {
-  data: {
-    user
-  },
-  error: sessionError
-} =
-  await supabaseClient.auth.getUser();
-
-if (
-  sessionError ||
-  !user
-) {
-
-  throw new Error(
-    "Ta session a expiré. Reconnecte-toi avant de créer un produit."
-  );
-
-}
-
-currentUser =
-  user;
+        data: {
+          user
+        },
+        error: sessionError
+      } =
+        await supabaseClient
+          .auth
+          .getUser();
 
 
-const {
-  data: product,
-  error: productError
-} =
-  await supabaseClient
-    .from("products")
-    .insert({
+      if (
+        sessionError ||
+        !user
+      ) {
 
-      user_id:
-        user.id,
+        throw new Error(
+          "Ta session a expiré. Reconnecte-toi avant de créer un produit."
+        );
 
-      name:
-        name,
+      }
 
-      category_id:
-        categoryId,
 
-      price:
-        price,
+      currentUser =
+        user;
 
-      description:
-        description
 
-    })
-    .select()
-    .single();
+      const {
+        data: product,
+        error: productError
+      } =
+        await supabaseClient
+          .from(
+            "products"
+          )
+          .insert({
+            user_id:
+              user.id,
+            name:
+              name,
+            category_id:
+              categoryId,
+            price:
+              price,
+            description:
+              description
+          })
+          .select()
+          .single();
 
 
       if (productError) {
@@ -1281,17 +1371,17 @@ const {
       } =
         await supabaseClient
           .storage
-          .from("product-images")
+          .from(
+            "product-images"
+          )
           .upload(
             filePath,
             file,
             {
               cacheControl:
                 "3600",
-
               upsert:
                 true,
-
               contentType:
                 file.type
             }
@@ -1301,14 +1391,18 @@ const {
       if (uploadError) {
 
         await supabaseClient
-          .from("products")
+          .from(
+            "products"
+          )
           .delete()
           .eq(
             "id",
             product.id
           );
 
+
         throw uploadError;
+
       }
 
 
@@ -1316,21 +1410,18 @@ const {
         error: imageError
       } =
         await supabaseClient
-          .from("product_images")
+          .from(
+            "product_images"
+          )
           .insert({
-
             product_id:
               product.id,
-
             user_id:
               currentUser.id,
-
             image_url:
               filePath,
-
             image_type:
               "source"
-
           });
 
 
@@ -1343,12 +1434,12 @@ const {
         error: updateError
       } =
         await supabaseClient
-          .from("products")
+          .from(
+            "products"
+          )
           .update({
-
             photo_url:
               filePath
-
           })
           .eq(
             "id",
@@ -1385,6 +1476,7 @@ const {
         error
       );
 
+
       productMessage.textContent =
         error?.message ||
         "Impossible de créer le produit.";
@@ -1394,10 +1486,12 @@ const {
       saveProductButton.disabled =
         false;
 
+
       saveProductButton.textContent =
         "Créer le produit";
 
     }
+
   }
 );
 
@@ -1414,13 +1508,16 @@ async function getSignedImageUrl(
     return null;
   }
 
+
   const {
     data,
     error
   } =
     await supabaseClient
       .storage
-      .from("product-images")
+      .from(
+        "product-images"
+      )
       .createSignedUrl(
         path,
         3600
@@ -1435,11 +1532,15 @@ async function getSignedImageUrl(
     );
 
     return null;
+
   }
 
 
-  return data?.signedUrl ||
-    null;
+  return (
+    data?.signedUrl ||
+    null
+  );
+
 }
 
 
@@ -1466,7 +1567,9 @@ async function loadProducts() {
     error
   } =
     await supabaseClient
-      .from("products")
+      .from(
+        "products"
+      )
       .select(`
         *,
         categories (
@@ -1481,7 +1584,8 @@ async function loadProducts() {
       .order(
         "created_at",
         {
-          ascending: false
+          ascending:
+            false
         }
       );
 
@@ -1493,13 +1597,16 @@ async function loadProducts() {
       error
     );
 
+
     productsGrid.innerHTML =
       '<div class="empty-state">' +
       '<div class="empty-icon">⚠️</div>' +
       '<p>Impossible de charger les produits.</p>' +
       '</div>';
 
+
     return;
+
   }
 
 
@@ -1511,17 +1618,21 @@ async function loadProducts() {
     productsGrid.innerHTML =
       "";
 
+
     emptyProducts.classList.remove(
       "hidden"
     );
 
+
     return;
+
   }
 
 
   emptyProducts.classList.add(
     "hidden"
   );
+
 
   productsGrid.innerHTML =
     "";
@@ -1547,7 +1658,9 @@ async function loadProducts() {
       product.price !== undefined
         ? Number(
             product.price
-          ).toFixed(2) +
+          ).toFixed(
+            2
+          ) +
           " €"
         : "Prix non défini";
 
@@ -1556,6 +1669,7 @@ async function loadProducts() {
       document.createElement(
         "article"
       );
+
 
     card.className =
       "product-card";
@@ -1657,6 +1771,7 @@ async function loadProducts() {
     );
 
   }
+
 }
 
 
@@ -1671,16 +1786,20 @@ async function openProductDetail(
   currentProduct =
     product;
 
+
   detailModal.classList.remove(
     "hidden"
   );
 
+
   generationMessage.textContent =
     "";
+
 
   aiEditorPanel.classList.add(
     "hidden"
   );
+
 
   detailContent.innerHTML =
     '<div class="empty-state">' +
@@ -1705,7 +1824,9 @@ async function openProductDetail(
     product.price !== undefined
       ? Number(
           product.price
-        ).toFixed(2) +
+        ).toFixed(
+          2
+        ) +
         " €"
       : "Prix non défini";
 
@@ -1767,12 +1888,15 @@ async function openProductDetail(
 
     '</div>';
 
+
   selectedReferenceImagePath =
-  product.photo_url || null;
+    product.photo_url ||
+    null;
 
-await loadProductReferenceImages();
 
-await loadGenerationHistory();
+  await loadProductReferenceImages();
+
+  await loadGenerationHistory();
 
 }
 
@@ -1789,6 +1913,7 @@ async function prepareAiPreview(
     return;
   }
 
+
   if (!imageUrl) {
 
     aiGenerationPreview.innerHTML =
@@ -1796,7 +1921,9 @@ async function prepareAiPreview(
       "<p>Photo indisponible</p>";
 
     return;
+
   }
+
 
   aiGenerationPreview.innerHTML =
     '<img src="' +
@@ -1804,6 +1931,7 @@ async function prepareAiPreview(
     '" alt="Photo modèle sélectionnée">';
 
 }
+
 
 /* =====================================================
    PHOTOS MODÈLES DU PRODUIT
@@ -1816,20 +1944,26 @@ async function loadProductReferenceImages() {
     !currentUser ||
     !referenceImageSelector
   ) {
+
     return;
+
   }
+
 
   referenceImageSelector.innerHTML =
     '<div class="reference-loading">' +
-    'Chargement des photos...' +
-    '</div>';
+    "Chargement des photos..." +
+    "</div>";
+
 
   const {
     data,
     error
   } =
     await supabaseClient
-      .from("product_images")
+      .from(
+        "product_images"
+      )
       .select("*")
       .eq(
         "product_id",
@@ -1846,9 +1980,11 @@ async function loadProductReferenceImages() {
       .order(
         "created_at",
         {
-          ascending: false
+          ascending:
+            false
         }
       );
+
 
   if (error) {
 
@@ -1857,7 +1993,9 @@ async function loadProductReferenceImages() {
       error
     );
 
-    productReferenceImages = [];
+
+    productReferenceImages =
+      [];
 
   } else {
 
@@ -1866,13 +2004,6 @@ async function loadProductReferenceImages() {
 
   }
 
-
-  /*
-   * Sécurité :
-   * si la photo principale du produit
-   * n'est pas encore présente dans
-   * product_images, on l'ajoute visuellement.
-   */
 
   if (
     currentProduct.photo_url &&
@@ -1910,32 +2041,25 @@ async function loadProductReferenceImages() {
   }
 
 
-  /*
-   * S'il n'y a aucune photo,
-   * on affiche un message.
-   */
-
   if (
-    productReferenceImages.length === 0
+    productReferenceImages.length ===
+    0
   ) {
 
     referenceImageSelector.innerHTML =
       '<div class="reference-empty">' +
-      'Aucune photo modèle disponible.' +
-      '</div>';
+      "Aucune photo modèle disponible." +
+      "</div>";
+
 
     selectedReferenceImagePath =
       null;
 
+
     return;
+
   }
 
-
-  /*
-   * Par défaut :
-   * on sélectionne la photo principale
-   * du produit.
-   */
 
   if (
     !selectedReferenceImagePath ||
@@ -1953,7 +2077,8 @@ async function loadProductReferenceImages() {
 
     selectedReferenceImagePath =
       currentProduct.photo_url ||
-      productReferenceImages[0].image_url;
+      productReferenceImages[0]
+        .image_url;
 
   }
 
@@ -1962,18 +2087,16 @@ async function loadProductReferenceImages() {
     "";
 
 
-  /*
-   * Création des vignettes
-   */
-
   for (
-    const image of productReferenceImages
+    const image of
+      productReferenceImages
   ) {
 
     const imageUrl =
       await getSignedImageUrl(
         image.image_url
       );
+
 
     if (!imageUrl) {
       continue;
@@ -1985,8 +2108,10 @@ async function loadProductReferenceImages() {
         "button"
       );
 
+
     button.type =
       "button";
+
 
     button.className =
       "reference-image-option";
@@ -2014,18 +2139,9 @@ async function loadProductReferenceImages() {
       "click",
       async function () {
 
-        /*
-         * Nouvelle photo sélectionnée
-         */
-
         selectedReferenceImagePath =
           image.image_url;
 
-
-        /*
-         * Mettre à jour
-         * la sélection visuelle
-         */
 
         document
           .querySelectorAll(
@@ -2047,11 +2163,6 @@ async function loadProductReferenceImages() {
         );
 
 
-        /*
-         * Afficher la photo sélectionnée
-         * dans la grande zone
-         */
-
         await prepareAiPreview(
           imageUrl
         );
@@ -2070,11 +2181,6 @@ async function loadProductReferenceImages() {
 
   }
 
-
-  /*
-   * Afficher immédiatement
-   * la photo sélectionnée.
-   */
 
   const selectedImage =
     productReferenceImages.find(
@@ -2096,6 +2202,7 @@ async function loadProductReferenceImages() {
         selectedImage.image_url
       );
 
+
     await prepareAiPreview(
       selectedUrl
     );
@@ -2103,6 +2210,7 @@ async function loadProductReferenceImages() {
   }
 
 }
+
 
 /* =====================================================
    OUVRIR ÉDITEUR IA
@@ -2120,6 +2228,7 @@ const generationLabels = {
 
   },
 
+
   promotion: {
 
     title:
@@ -2130,6 +2239,7 @@ const generationLabels = {
 
   },
 
+
   vente: {
 
     title:
@@ -2139,6 +2249,7 @@ const generationLabels = {
       "Crée le visuel principal destiné à donner envie d’acheter."
 
   },
+
 
   decor: {
 
@@ -2163,6 +2274,7 @@ function openAiEditor(
       "Aucun produit sélectionné.";
 
     return;
+
   }
 
 
@@ -2177,21 +2289,6 @@ function openAiEditor(
 
   selectedGenerationType =
     type;
-
-
-  if (aiEditorTitle) {
-
-  aiEditorTitle.textContent =
-    label.title;
-
-}
-
-if (aiEditorSubtitle) {
-
-  aiEditorSubtitle.textContent =
-    label.subtitle;
-
-}
 
 
   aiInstructions.value =
@@ -2212,8 +2309,10 @@ if (aiEditorSubtitle) {
 
 
   aiEditorPanel.scrollIntoView({
-    behavior: "smooth",
-    block: "start"
+    behavior:
+      "smooth",
+    block:
+      "start"
   });
 
 }
@@ -2244,11 +2343,13 @@ document
     }
   );
 
+
 /* =====================================================
    APERÇU PERSONNALISATION
 ===================================================== */
 
-let personalizationImageUrl = null;
+let personalizationImageUrl =
+  null;
 
 
 function updatePersonalizationPreview() {
@@ -2257,6 +2358,7 @@ function updatePersonalizationPreview() {
     return;
   }
 
+
   if (!personalizationImageUrl) {
 
     personalizationPreview.innerHTML =
@@ -2264,19 +2366,28 @@ function updatePersonalizationPreview() {
       "<p>Photo du produit indisponible</p>";
 
     return;
+
   }
 
+
   const text =
-    personalizationText?.value.trim() || "";
+    personalizationText?.value.trim() ||
+    "";
 
- const color =
-  personalizationColor?.value || "#E6C2BF";
 
-const gradient =
-  personalizationColor?.dataset.gradient || "";
+  const color =
+    personalizationColor?.value ||
+    "#E6C2BF";
 
-const font =
-  personalizationFont?.value || "Arial";
+
+  const gradient =
+    personalizationColor?.dataset.gradient ||
+    "";
+
+
+  const font =
+    personalizationFont?.value ||
+    "Arial";
 
 
   personalizationPreview.innerHTML =
@@ -2292,20 +2403,28 @@ const font =
     '<span ' +
     'class="personalization-text-overlay" ' +
     'style="' +
-(
-  gradient
-    ? 'color:transparent;background-image:linear-gradient(135deg,' +
-      gradient +
-      ');background-clip:text;-webkit-background-clip:text;'
-    : 'color:' + color + ';'
-) +
-'font-family:' +
-font +
-';">' +
-    escapeHtml(text) +
-    '</span>' +
 
-    '</div>';
+    (
+      gradient
+        ? "color:transparent;background-image:linear-gradient(135deg," +
+          gradient +
+          ");background-clip:text;-webkit-background-clip:text;"
+        : "color:" +
+          color +
+          ";"
+    ) +
+
+    "font-family:" +
+    font +
+    ';">' +
+
+    escapeHtml(
+      text
+    ) +
+
+    "</span>" +
+
+    "</div>";
 
 }
 
@@ -2318,31 +2437,41 @@ async function openPersonalizationPreview() {
       "Aucun produit sélectionné.";
 
     return;
+
   }
+
 
   personalizationPanel.classList.remove(
     "hidden"
   );
 
+
   personalizationText.value =
     "";
+
 
   personalizationColor.value =
     "#d98fa6";
 
+
   personalizationFont.value =
     "Arial";
+
 
   personalizationImageUrl =
     await getSignedImageUrl(
       currentProduct.photo_url
     );
 
+
   updatePersonalizationPreview();
 
+
   personalizationPanel.scrollIntoView({
-    behavior: "smooth",
-    block: "start"
+    behavior:
+      "smooth",
+    block:
+      "start"
   });
 
 }
@@ -2354,13 +2483,16 @@ function closePersonalizationPreview() {
     "hidden"
   );
 
+
   personalizationImageUrl =
     null;
 
 }
 
 
-if (openPersonalizationButton) {
+if (
+  openPersonalizationButton
+) {
 
   openPersonalizationButton.addEventListener(
     "click",
@@ -2370,7 +2502,9 @@ if (openPersonalizationButton) {
 }
 
 
-if (closePersonalization) {
+if (
+  closePersonalization
+) {
 
   closePersonalization.addEventListener(
     "click",
@@ -2380,7 +2514,9 @@ if (closePersonalization) {
 }
 
 
-if (personalizationText) {
+if (
+  personalizationText
+) {
 
   personalizationText.addEventListener(
     "input",
@@ -2390,7 +2526,9 @@ if (personalizationText) {
 }
 
 
-if (personalizationColor) {
+if (
+  personalizationColor
+) {
 
   personalizationColor.addEventListener(
     "input",
@@ -2400,7 +2538,9 @@ if (personalizationColor) {
 }
 
 
-if (personalizationFont) {
+if (
+  personalizationFont
+) {
 
   personalizationFont.addEventListener(
     "change",
@@ -2409,59 +2549,79 @@ if (personalizationFont) {
 
 }
 
+
 /* =====================================================
    PALETTE DE COULEURS
 ===================================================== */
 
 document
-  .querySelectorAll(".color-swatch")
-  .forEach(function (swatch) {
+  .querySelectorAll(
+    ".color-swatch"
+  )
+  .forEach(
+    function (swatch) {
 
-    swatch.addEventListener(
-      "click",
-      function () {
+      swatch.addEventListener(
+        "click",
+        function () {
 
-        document
-          .querySelectorAll(".color-swatch")
-          .forEach(function (item) {
+          document
+            .querySelectorAll(
+              ".color-swatch"
+            )
+            .forEach(
+              function (item) {
 
-            item.classList.remove(
-              "selected"
+                item.classList.remove(
+                  "selected"
+                );
+
+              }
             );
 
-          });
 
-        swatch.classList.add(
-          "selected"
-        );
+          swatch.classList.add(
+            "selected"
+          );
 
-        if (swatch.dataset.gradient) {
 
-          const colors =
-            swatch.dataset.gradient.split(",");
+          if (
+            swatch.dataset.gradient
+          ) {
 
-          personalizationColor.value =
-            colors[0];
+            const colors =
+              swatch.dataset.gradient
+                .split(
+                  ","
+                );
 
-          personalizationColor.dataset.gradient =
-            swatch.dataset.gradient;
 
-        } else {
+            personalizationColor.value =
+              colors[0];
 
-          personalizationColor.value =
-            swatch.dataset.color;
 
-          personalizationColor.dataset.gradient =
-            "";
+            personalizationColor.dataset.gradient =
+              swatch.dataset.gradient;
+
+          } else {
+
+            personalizationColor.value =
+              swatch.dataset.color;
+
+
+            personalizationColor.dataset.gradient =
+              "";
+
+          }
+
+
+          updatePersonalizationPreview();
 
         }
+      );
 
-        updatePersonalizationPreview();
-
-      }
-    );
-
-  });
+    }
+  );
 
 
 /* =====================================================
@@ -2470,7 +2630,9 @@ document
 
 function closeAiEditorPanel() {
 
-  if (aiEditorPanel) {
+  if (
+    aiEditorPanel
+  ) {
 
     aiEditorPanel.classList.add(
       "hidden"
@@ -2478,20 +2640,13 @@ function closeAiEditorPanel() {
 
   }
 
+
   selectedGenerationType =
     null;
 
+
   generationMessage.textContent =
     "";
-}
-
-
-if (closeAiEditor) {
-
-  closeAiEditor.addEventListener(
-    "click",
-    closeAiEditorPanel
-  );
 
 }
 
@@ -2606,8 +2761,8 @@ function buildGenerationPrompt() {
 
 
   return prompt;
-}
 
+}
 
 
 /* =====================================================
@@ -2615,12 +2770,6 @@ function buildGenerationPrompt() {
 ===================================================== */
 
 async function getProductReferenceImageData() {
-
-  /*
-   * Utilise la photo choisie par l'utilisateur.
-   * Si aucune sélection n'existe, on utilise
-   * exceptionnellement la photo principale.
-   */
 
   const referencePath =
     selectedReferenceImagePath ||
@@ -2669,7 +2818,9 @@ async function getProductReferenceImageData() {
         img.onload =
           function () {
 
-            resolve(img);
+            resolve(
+              img
+            );
 
           };
 
@@ -2694,8 +2845,10 @@ async function getProductReferenceImageData() {
 
 
   /*
-   * Redimensionnement
-   * maximum 512 × 512
+   * IMPORTANT :
+   * Cloudflare FLUX.2 klein exige que
+   * l'image de référence soit STRICTEMENT
+   * inférieure à 512 × 512.
    */
 
   const maxSize =
@@ -2712,7 +2865,8 @@ async function getProductReferenceImageData() {
   const scale =
     Math.min(
       1,
-      maxSize / largestSide
+      maxSize /
+        largestSide
     );
 
 
@@ -2744,6 +2898,7 @@ async function getProductReferenceImageData() {
 
   canvas.width =
     width;
+
 
   canvas.height =
     height;
@@ -2795,6 +2950,7 @@ prepareAiGeneration.addEventListener(
         "Aucun produit sélectionné.";
 
       return;
+
     }
 
 
@@ -2804,6 +2960,7 @@ prepareAiGeneration.addEventListener(
         "Ta session a expiré. Reconnecte-toi.";
 
       return;
+
     }
 
 
@@ -2813,6 +2970,7 @@ prepareAiGeneration.addEventListener(
         "Choisis d'abord un type de visuel.";
 
       return;
+
     }
 
 
@@ -2851,7 +3009,6 @@ prepareAiGeneration.addEventListener(
             "design_generations"
           )
           .insert({
-
             product_id:
               currentProduct.id,
 
@@ -2904,199 +3061,50 @@ prepareAiGeneration.addEventListener(
 
 
       const {
-  data: aiData,
-  error: aiError
-} =
-  await supabaseClient
-    .functions
-    .invoke(
-      "clever-processor",
-      {
-        body: {
-          prompt: prompt,
-          image_data: imageData
-        }
-      }
-    );
+        data: aiData,
+        error: aiError
+      } =
+        await supabaseClient
+          .functions
+          .invoke(
+            "clever-processor",
+            {
+              body: {
+                prompt:
+                  prompt,
+
+                image_data:
+                  imageData
+
+              }
+            }
+          );
 
 
-/* =====================================================
-   DIAGNOSTIC — RÉPONSE DE L'IA
-===================================================== */
-
-console.log(
-  "========== DESIGNIA AI =========="
-);
-
-console.log(
-  "Erreur Supabase :",
-  aiError
-);
-
-console.log(
-  "Réponse complète Supabase :",
-  aiData
-);
-
-console.log(
-  "Image reçue :",
-  aiData?.image
-    ? "OUI"
-    : "NON"
-);
-
-if (aiData?.image) {
-
-  console.log(
-    "Longueur de l'image :",
-    aiData.image.length
-  );
-
-  console.log(
-    "Début de l'image :",
-    aiData.image.substring(0, 80)
-  );
-
-}
-
-
-/* =====================================================
-   GESTION DES ERREURS
-===================================================== */
-
-if (aiError) {
-
-  let serverMessage = "";
-
-  try {
-
-    if (aiError.context) {
-
-      const response =
-        aiError.context;
-
-      if (
-        typeof response.json ===
-        "function"
-      ) {
-
-        const errorBody =
-          await response.json();
-
-        serverMessage =
-          errorBody?.error ||
-          "";
-
-      }
-
-    }
-
-  } catch (error) {
-
-    console.warn(
-      "Impossible de lire le détail de l'erreur IA.",
-      error
-    );
-
-  }
-
-  throw new Error(
-    serverMessage ||
-    aiError.message ||
-    "La génération IA a échoué."
-  );
-
-}
-
-
-if (!aiData) {
-
-  throw new Error(
-    "Aucune réponse n'a été reçue du serveur IA."
-  );
-
-}
-
-
-if (!aiData.image) {
-
-  console.error(
-    "La génération semble avoir répondu, mais aucune image n'est présente dans aiData."
-  );
-
-  throw new Error(
-    "L'image a été générée mais Designia n'a reçu aucun visuel."
-  );
-
-}
-
-
-/* =====================================================
-   VÉRIFICATION DU FORMAT IMAGE
-===================================================== */
-
-const generatedImage =
-  aiData.image;
-
-console.log(
-  "Image finale prête à être affichée :",
-  generatedImage.substring(0, 80)
-);
-
-
-/* =====================================================
-   AFFICHAGE IMMÉDIAT DE L'IMAGE
-===================================================== */
-
-if (aiGenerationPreview) {
-
-  aiGenerationPreview.innerHTML = "";
-
-  const generatedImageElement =
-    document.createElement("img");
-
-  generatedImageElement.src =
-    generatedImage;
-
-  generatedImageElement.alt =
-    "Image générée par Designia AI";
-
-  generatedImageElement.style.width =
-    "100%";
-
-  generatedImageElement.style.height =
-    "auto";
-
-  generatedImageElement.style.display =
-    "block";
-
-  generatedImageElement.style.borderRadius =
-    "16px";
-
-  generatedImageElement.onload =
-    function () {
+      /* =====================================================
+         DIAGNOSTIC — RÉPONSE IA
+      ===================================================== */
 
       console.log(
-        "✅ IMAGE AFFICHÉE CORRECTEMENT DANS DESIGNIA"
+        "========== DESIGNIA AI =========="
       );
 
-    };
 
-  generatedImageElement.onerror =
-    function () {
-
-      console.error(
-        "❌ L'image a été reçue mais le navigateur ne parvient pas à l'afficher."
+      console.log(
+        "Erreur Supabase :",
+        aiError
       );
 
-    };
 
-  aiGenerationPreview.appendChild(
-    generatedImageElement
-  );
+      console.log(
+        "Réponse complète Supabase :",
+        aiData
+      );
 
-}
 
+      /* =====================================================
+         ERREUR SUPABASE
+      ===================================================== */
 
       if (aiError) {
 
@@ -3106,7 +3114,7 @@ if (aiGenerationPreview) {
         );
 
 
-        let details =
+        let serverMessage =
           "";
 
 
@@ -3116,25 +3124,39 @@ if (aiGenerationPreview) {
             aiError.context
           ) {
 
-            const errorBody =
-              await aiError.context.json();
+            const response =
+              aiError.context;
 
 
-            details =
-              errorBody?.error ||
-              "";
+            if (
+              typeof response.json ===
+              "function"
+            ) {
+
+              const errorBody =
+                await response.json();
+
+
+              serverMessage =
+                errorBody?.error ||
+                "";
+
+            }
 
           }
 
-        } catch (_) {
+        } catch (error) {
 
-          // Rien à faire si le détail n'est pas lisible
+          console.warn(
+            "Impossible de lire le détail de l'erreur IA.",
+            error
+          );
 
         }
 
 
         throw new Error(
-          details ||
+          serverMessage ||
           aiError.message ||
           "Impossible de contacter le moteur IA."
         );
@@ -3142,18 +3164,192 @@ if (aiGenerationPreview) {
       }
 
 
-      if (
-        !aiData ||
-        !aiData.success ||
-        !aiData.image
-      ) {
+      /* =====================================================
+         VÉRIFICATION RÉPONSE
+      ===================================================== */
+
+      if (!aiData) {
 
         throw new Error(
-          aiData?.error ||
+          "Aucune réponse n'a été reçue du moteur IA."
+        );
+
+      }
+
+
+      console.log(
+        "Image reçue :",
+        aiData.image
+          ? "OUI"
+          : "NON"
+      );
+
+
+      if (!aiData.image) {
+
+        console.error(
+          "La génération a répondu sans image :",
+          aiData
+        );
+
+
+        throw new Error(
+          aiData.error ||
           "L'IA n'a pas retourné d'image."
         );
 
       }
+
+
+      const generatedImage =
+        aiData.image;
+
+
+      console.log(
+        "Longueur de l'image reçue :",
+        generatedImage.length
+      );
+
+
+      console.log(
+        "Début de l'image :",
+        generatedImage.substring(
+          0,
+          80
+        )
+      );
+
+
+      /* =====================================================
+         VÉRIFICATION FORMAT IMAGE
+      ===================================================== */
+
+      if (
+        !generatedImage.startsWith(
+          "data:image/"
+        )
+      ) {
+
+        console.error(
+          "Format image inattendu :",
+          generatedImage.substring(
+            0,
+            120
+          )
+        );
+
+
+        throw new Error(
+          "Le moteur IA a retourné une image dans un format inattendu."
+        );
+
+      }
+
+
+      /* =====================================================
+         AFFICHAGE IMMÉDIAT DE L'IMAGE
+      ===================================================== */
+
+      generationMessage.textContent =
+        "Affichage du visuel généré...";
+
+
+      if (!aiGenerationPreview) {
+
+        throw new Error(
+          "La zone d'affichage du visuel IA est introuvable dans la page."
+        );
+
+      }
+
+
+      aiGenerationPreview.innerHTML =
+        "";
+
+
+      const generatedImageElement =
+        document.createElement(
+          "img"
+        );
+
+
+      generatedImageElement.src =
+        generatedImage;
+
+
+      generatedImageElement.alt =
+        "Image générée par Designia AI";
+
+
+      generatedImageElement.className =
+        "generated-ai-image";
+
+
+      generatedImageElement.style.display =
+        "block";
+
+
+      generatedImageElement.style.width =
+        "100%";
+
+
+      generatedImageElement.style.height =
+        "auto";
+
+
+      generatedImageElement.style.maxWidth =
+        "100%";
+
+
+      generatedImageElement.style.borderRadius =
+        "16px";
+
+
+      generatedImageElement.style.objectFit =
+        "contain";
+
+
+      generatedImageElement.onload =
+        function () {
+
+          console.log(
+            "✅ IMAGE IA AFFICHÉE AVEC SUCCÈS"
+          );
+
+
+          generationMessage.textContent =
+            "Visuel généré et affiché ✨";
+
+        };
+
+
+      generatedImageElement.onerror =
+        function () {
+
+          console.error(
+            "❌ L'image a été reçue mais le navigateur ne peut pas l'afficher."
+          );
+
+
+          generationMessage.textContent =
+            "L'image a été reçue mais son affichage a échoué.";
+
+        };
+
+
+      aiGenerationPreview.appendChild(
+        generatedImageElement
+      );
+
+
+      console.log(
+        "Image ajoutée à aiGenerationPreview :",
+        aiGenerationPreview.querySelector(
+          "img"
+        )
+          ? "OUI"
+          : "NON"
+      );
 
 
       /* =========================
@@ -3161,7 +3357,7 @@ if (aiGenerationPreview) {
       ========================== */
 
       generationMessage.textContent =
-        "Visuel généré ✨";
+        "Enregistrement du visuel généré...";
 
 
       const {
@@ -3174,7 +3370,7 @@ if (aiGenerationPreview) {
           .update({
 
             result_url:
-              aiData.image
+              generatedImage
 
           })
           .eq(
@@ -3195,14 +3391,8 @@ if (aiGenerationPreview) {
 
 
       /* =========================
-         5. AFFICHER LE VISUEL
+         5. ACTUALISER L'HISTORIQUE
       ========================== */
-
-      aiGenerationPreview.innerHTML =
-        '<img src="' +
-        aiData.image +
-        '" alt="Visuel généré par IA">';
-
 
       await loadGenerationHistory();
 
@@ -3268,6 +3458,7 @@ if (aiGenerationPreview) {
   }
 );
 
+
 /* =====================================================
    HISTORIQUE DES GÉNÉRATIONS
 ===================================================== */
@@ -3280,13 +3471,14 @@ async function loadGenerationHistory() {
   ) {
 
     return;
+
   }
 
 
   generationHistory.innerHTML =
     '<div class="history-empty">' +
-    'Chargement de l’historique...' +
-    '</div>';
+    "Chargement de l’historique..." +
+    "</div>";
 
 
   const {
@@ -3309,7 +3501,8 @@ async function loadGenerationHistory() {
       .order(
         "created_at",
         {
-          ascending: false
+          ascending:
+            false
         }
       );
 
@@ -3321,12 +3514,15 @@ async function loadGenerationHistory() {
       error
     );
 
+
     generationHistory.innerHTML =
       '<div class="history-empty">' +
-      'Impossible de charger l’historique.' +
-      '</div>';
+      "Impossible de charger l’historique." +
+      "</div>";
+
 
     return;
+
   }
 
 
@@ -3337,10 +3533,12 @@ async function loadGenerationHistory() {
 
     generationHistory.innerHTML =
       '<div class="history-empty">' +
-      'Aucune demande pour le moment.' +
-      '</div>';
+      "Aucune demande pour le moment." +
+      "</div>";
+
 
     return;
+
   }
 
 
@@ -3383,11 +3581,8 @@ async function loadGenerationHistory() {
         "history-item";
 
 
-      /* =================================================
-         CONTENU DE L'HISTORIQUE
-      ================================================= */
-
-      let preview = "";
+      let preview =
+        "";
 
 
       if (
@@ -3406,8 +3601,8 @@ async function loadGenerationHistory() {
 
         preview =
           '<div class="history-preview-empty">' +
-          '⏳' +
-          '</div>';
+          "⏳" +
+          "</div>";
 
       }
 
@@ -3418,23 +3613,27 @@ async function loadGenerationHistory() {
 
         preview +
 
-        '</div>' +
+        "</div>" +
 
         '<div class="history-item-info">' +
 
-        '<strong>' +
+        "<strong>" +
+
         escapeHtml(
           title
         ) +
-        '</strong>' +
 
-        '<small>' +
+        "</strong>" +
+
+        "<small>" +
+
         escapeHtml(
           date
         ) +
-        '</small>' +
 
-        '</div>' +
+        "</small>" +
+
+        "</div>" +
 
         '<span class="history-status">' +
 
@@ -3444,12 +3643,8 @@ async function loadGenerationHistory() {
             : "En attente"
         ) +
 
-        '</span>';
+        "</span>";
 
-
-      /* =================================================
-         OUVRIR LE VISUEL AU CLIC
-      ================================================= */
 
       if (
         generation.result_url
@@ -3464,12 +3659,12 @@ async function loadGenerationHistory() {
           function () {
 
             aiGenerationPreview.innerHTML =
-
               '<img ' +
               'src="' +
               generation.result_url +
               '" ' +
-              'alt="Visuel généré par IA">';
+              'alt="Visuel généré par IA" ' +
+              'class="generated-ai-image">';
 
 
             generationMessage.textContent =
@@ -3501,11 +3696,14 @@ function closeDetailProductModal() {
     "hidden"
   );
 
+
   currentProduct =
     null;
 
+
   selectedGenerationType =
     null;
+
 
   aiEditorPanel.classList.add(
     "hidden"
